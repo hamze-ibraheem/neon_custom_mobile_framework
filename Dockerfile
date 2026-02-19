@@ -7,8 +7,13 @@ WORKDIR /app
 # Copy your custom SDK/framework files from the repo to the container
 COPY . .
 
-# Ensure your custom dart scripts are executable (if applicable)
-# RUN chmod +x bin/your_custom_script.dart
+# Setup the app
+WORKDIR /app/NeonFramework-2/neon_framework/my_2nd_test_app
+RUN dart pub get
 
-# This keeps the container running so the "Console" stays active
-CMD ["tail", "-f", "/dev/null"]
+# Run the app using the framework CLI
+# Framework CLI is at ../bin/neon.dart
+# App is at . (current workdir)
+# Command: dart ../bin/neon.dart run -t web --release
+
+CMD ["dart", "run", "neon_framework:neon", "run", "-t", "web", "--release"]

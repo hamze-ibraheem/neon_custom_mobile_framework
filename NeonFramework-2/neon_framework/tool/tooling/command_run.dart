@@ -22,8 +22,8 @@ class RunCommand extends Command<int> {
       'target',
       abbr: 't',
       help: 'Target platform.',
-      allowed: ['android', 'ios'],
-      defaultsTo: 'android',
+      allowed: ['android', 'ios', 'web'],
+      defaultsTo: 'web',
     );
     argParser.addOption(
       'device',
@@ -175,7 +175,7 @@ class RunCommand extends Command<int> {
         workingDirectory: project.rootPath,
         mode: ProcessStartMode.inheritStdio,
         environment: {
-          'PORT': '8080', // Force 8080 for bridge compatibility
+          'PORT': Platform.environment['PORT'] ?? '8080', // Use env PORT or default to 8080
         },
       );
 
