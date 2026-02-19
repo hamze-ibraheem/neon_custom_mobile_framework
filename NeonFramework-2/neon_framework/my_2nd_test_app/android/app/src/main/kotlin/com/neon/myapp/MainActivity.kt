@@ -36,7 +36,7 @@ class MainActivity : Activity() {
     thread {
       try {
         // Connect to localhost:8080 (via adb reverse)
-        val url = URL("http://127.0.0.1:8080")
+        val url = URL("https://custom-frameworks-neon-framework.iix8qf.easypanel.host/api/tree")
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
 
@@ -71,7 +71,7 @@ class MainActivity : Activity() {
   private fun sendAction(id: String, index: Int? = null, value: Any? = null) {
     thread {
       try {
-        val url = URL("http://127.0.0.1:8080/action")
+        val url = URL("https://custom-frameworks-neon-framework.iix8qf.easypanel.host/action")
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "POST"
         connection.doOutput = true

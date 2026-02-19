@@ -25,7 +25,7 @@ class ViewController: UIViewController, UITabBarDelegate {
     
     private func fetchUiTree() {
         // The iOS Simulator shares the Mac's localhost automatically!
-        guard let url = URL(string: "http://127.0.0.1:8080") else { return }
+        guard let url = URL(string: "https://custom-frameworks-neon-framework.iix8qf.easypanel.host/api/tree") else { return }
         
         let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
             guard let self = self else { return }
@@ -1347,7 +1347,7 @@ class ViewController: UIViewController, UITabBarDelegate {
         }
         
         private func sendActionToDart(buttonId: String, index: Int? = nil, value: Any? = nil) {
-            guard let url = URL(string: "http://127.0.0.1:8080/action") else { return }
+            guard let url = URL(string: "https://custom-frameworks-neon-framework.iix8qf.easypanel.host/action") else { return }
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
