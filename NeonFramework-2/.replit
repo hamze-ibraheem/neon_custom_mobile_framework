@@ -1,0 +1,35 @@
+entrypoint = "main.dart"
+modules = ["dart-3.3", "dart-3.10"]
+
+[nix]
+channel="stable-24_05"
+
+[deployment]
+run = ["dart", "main.dart"]
+deploymentTarget = "cloudrun"
+
+[agent]
+expertMode = true
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Neon Example"
+
+[[workflows.workflow]]
+name = "Neon Example"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd neon_framework && dart run example/main.dart"
+
+[workflows.workflow.metadata]
+outputType = "console"

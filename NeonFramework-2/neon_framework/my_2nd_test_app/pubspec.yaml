@@ -1,0 +1,13 @@
+name: my_2nd_test_app
+description: A Neon Framework application.
+version: 1.0.0
+publish_to: none
+
+
+environment:
+  sdk: ^3.0.0
+
+
+dependencies:
+  neon_framework:
+    path: /Users/hamzaibrahim/Downloads/NeonFramework-latest-v1-2026-2/NeonFramework-2/neon_framework

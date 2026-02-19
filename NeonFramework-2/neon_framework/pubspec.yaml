@@ -1,0 +1,22 @@
+name: neon_framework
+description: Neon Framework — A Dart-based UI framework for mobile (Android & iOS).
+version: 0.1.0
+homepage: https://github.com/neon-framework/neon
+
+publish_to: none
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  args: ^2.4.0
+  path: ^1.8.0
+  watcher: ^1.1.0
+
+executables:
+  neon: neon
+
+
+dev_dependencies:
+  test: ^1.24.0
+

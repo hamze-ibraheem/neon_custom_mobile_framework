@@ -1,0 +1,15 @@
+name: MyApp
+description: "Neon Framework Main Project"
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  args: ^2.4.0
+  path: ^1.8.0
+  watcher: ^1.1.0
+
+dev_dependencies:
+  test: ^1.24.0

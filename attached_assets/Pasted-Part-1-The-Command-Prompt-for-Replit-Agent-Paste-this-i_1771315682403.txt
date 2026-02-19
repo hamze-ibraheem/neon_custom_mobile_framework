@@ -1,0 +1,69 @@
+Part 1: The Command Prompt for Replit Agent
+
+Paste this into the Replit Agent chat to set up the logic.
+
+Prompt: > "I am building a custom Dart UI framework called 'Neon'. I need to create a build-time script that acts as a transpiler.
+
+Setup: Create a directory tools/transpiler.
+
+Logic: Write a Dart script (transpile_widgets.dart) that uses the analyzer package to parse any imported Flutter package in pubspec.yaml.
+
+Conversion: For every StatelessWidget or StatefulWidget found in the target Flutter package, the script should generate a new file in lib/neon_compat/ that wraps the Flutter widget.
+
+Mapping: Replace standard Material widgets with Neon equivalents:
+
+Container -> NeonContainer
+
+Text -> NeonText
+
+ElevatedButton -> NeonButton
+
+Integration: Update the .replit file so that when I click 'Run', it first executes dart tools/transpiler/transpile_widgets.dart before running the main app. This ensures user apps can import package:neon/neon_compat.dart to use converted widgets."
+
+Part 2: Configuration Files
+
+To make this work automatically, ensure your .replit and replit.nix files are configured as follows:
+
+1. .replit (The Execution Logic)
+
+This file tells Replit to run your framework's "Conversion" step every time the app starts.
+
+Ini, TOML
+# .replit
+run = "dart run tools/transpiler/main.dart && flutter run -d web-server --web-port 8080 --web-hostname 0.0.0.0"
+
+[entrypoint]
+path = "lib/main.dart"
+
+[modules]
+modules = ["dart", "flutter"]
+2. replit.nix (The Environment)
+
+Ensure the analyzer and source_gen dependencies are available in the nix environment if you aren't using standard pub get.
+
+Nix
+{ pkgs }: {
+  deps = [
+    pkgs.flutter
+    pkgs.dart
+  ];
+}
+Part 3: How the Conversion Works (Concept)
+
+Your Neon framework needs a "Bridge" logic. Since you want to support existing Flutter packages, your transpiler will perform a Source-to-Source transformation.
+
+The Transpiler Logic (tools/transpiler/main.dart):
+
+Scan lib/: Look for imports pointing to the external Flutter package.
+
+Parse AST: Use the analyzer package to find the build() methods.
+
+Recursive Replacement:
+
+It looks for return Container(...)
+
+It replaces it with return NeonContainer(...)
+
+It copies all arguments (like child, color, width) to the new constructor.
+
+Output: It writes these "Neon-ified" versions into a hidden folder that the user's app can then access.

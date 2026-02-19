@@ -1,0 +1,19 @@
+name: my_2nd_test_app
+version: 1.0.0
+
+platforms:
+  android:
+    min_sdk: 21
+    target_sdk: 34
+    package: com.example.my_2nd_test_app
+  ios:
+    min_version: "13.0"
+    bundle_id: com.example.my_2nd_test_app
+
+build:
+  output: build/
+  obfuscate: false
+
+hot_reload:
+  enabled: true
+  mode: state_preserving

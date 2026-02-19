@@ -1,0 +1,16 @@
+analyzer:
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
+  errors:
+    missing_return: error
+    dead_code: warning
+
+linter:
+  rules:
+    - prefer_const_constructors
+    - prefer_final_locals
+    - avoid_print
+    - annotate_overrides
+    - prefer_single_quotes
+    - sort_constructors_first

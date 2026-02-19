@@ -1,0 +1,14 @@
+name: neon_app_deploy
+description: Deployment wrapper for Neon Framework test app.
+version: 1.0.0
+publish_to: none
+
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  neon_framework:
+    path: /Users/hamzaibrahim/Downloads/NeonFramework-latest-v1-2026-2/NeonFramework-2/neon_framework
+  analyzer: ^6.0.0
+  path: ^1.8.0
