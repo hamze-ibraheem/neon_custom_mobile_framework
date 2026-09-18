@@ -9,4 +9,4 @@ environment:
 
 dependencies:
   neon_framework:
-    path: /Users/hamzaibrahim/Downloads/NeonFramework-latest-v1-2026-2/NeonFramework-2/neon_framework
+    path: ..

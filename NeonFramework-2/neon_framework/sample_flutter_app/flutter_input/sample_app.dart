@@ -1,37 +1,37 @@
-import 'package:flutter/material.dart';
+import 'package:neon_framework/neon.dart';
 
 class MyHomePage extends StatelessWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+  const MyHomePage({String? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  NeonWidget build(NeonBuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          padding: EdgeInsets.all(16),
-          child: Text(
+        const Container(
+          padding: NeonEdgeInsets.all(16),
+          child: const Text(
             'Hello from Flutter!',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: NeonTextStyle(fontSize: 24, fontWeight: NeonFontWeight.bold),
           ),
         ),
-        SizedBox(height: 16),
-        ElevatedButton(
+        const SizedBox(height: 16),
+        FilledButton(
           onPressed: () {
             print('Button pressed');
           },
-          child: Text('Click Me'),
+          child: const Text('Click Me'),
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             IconButton(
               onPressed: () {},
-              icon: Text('⭐'),
+              icon: const Text('⭐'),
             ),
             OutlinedButton(
               onPressed: () {},
-              child: Text('Outline'),
+              child: const Text('Outline'),
             ),
           ],
         ),
@@ -41,38 +41,38 @@ class MyHomePage extends StatelessWidget {
 }
 
 class CounterWidget extends StatefulWidget {
-  const CounterWidget({Key? key}) : super(key: key);
+  const CounterWidget({String? key}) : super(key: key);
 
   @override
-  State<CounterWidget> createState() => _CounterWidgetState();
+  NeonState<CounterWidget> createState() => _CounterWidgetState();
 }
 
-class _CounterWidgetState extends State<CounterWidget> {
+class _CounterWidgetState extends NeonState<CounterWidget> {
   int count = 0;
 
   @override
-  Widget build(BuildContext context) {
+  NeonWidget build(NeonBuildContext context) {
     return Column(
       children: [
         Text('Count: $count'),
-        ElevatedButton(
+        FilledButton(
           onPressed: () {
             setState(() {
               count++;
             });
           },
-          child: Text('Increment'),
+          child: const Text('Increment'),
         ),
-        Card(
+        const Card(
           child: ListTile(
             leading: Text('📊'),
             title: Text('Statistics'),
             subtitle: Text('Tap for details'),
           ),
         ),
-        LinearProgressIndicator(value: 0.5),
-        CircularProgressIndicator(),
-        Tooltip(
+        const LinearProgressIndicator(value: 0.5),
+        const CircularProgressIndicator(),
+        const Tooltip(
           message: 'This is a tooltip',
           child: Text('Hover me'),
         ),

@@ -103,7 +103,11 @@ class NeonElement {
 
     // Export properties (primitive handling)
     if (widget is Text) {
-      data['text'] = (widget as Text).data;
+      final t = widget as Text;
+      data['text'] = t.data;
+      data['color'] = t.style.color.value;
+      data['fontSize'] = t.style.fontSize;
+      data['fontWeight'] = t.style.fontWeight.name;
     }
 
     // Export layout properties
@@ -139,7 +143,10 @@ class NeonElement {
       data['destinations'] = nav.destinations.map((d) {
         String iconText = '';
         if (d.icon is Text) iconText = (d.icon as Text).data;
-        return {'label': d.label, 'icon': {'text': iconText}};
+        return {
+          'label': d.label,
+          'icon': {'text': iconText}
+        };
       }).toList();
     }
 
@@ -208,21 +215,33 @@ class NeonElement {
     if (sourceWidget is ActionChip) {
       final chip = sourceWidget as ActionChip;
       data['enabled'] = chip.enabled;
+      if (chip.label is Text) {
+        data['label'] = (chip.label as Text).data;
+      }
     }
 
     if (sourceWidget is FilterChip) {
       final chip = sourceWidget as FilterChip;
       data['selected'] = chip.selected;
+      if (chip.label is Text) {
+        data['label'] = (chip.label as Text).data;
+      }
     }
 
     if (sourceWidget is ChoiceChip) {
       final chip = sourceWidget as ChoiceChip;
       data['selected'] = chip.selected;
+      if (chip.label is Text) {
+        data['label'] = (chip.label as Text).data;
+      }
     }
 
     if (sourceWidget is InputChip) {
       final chip = sourceWidget as InputChip;
       data['selected'] = chip.selected;
+      if (chip.label is Text) {
+        data['label'] = (chip.label as Text).data;
+      }
     }
 
     if (sourceWidget is Switch) {
@@ -293,7 +312,11 @@ class NeonElement {
         data['dialogActions'] = dlg.actions!.map((a) {
           if (a is Button) {
             final child = a.child;
-            return {'type': 'Button', 'label': child is Text ? child.data : '', 'key': a.key};
+            return {
+              'type': 'Button',
+              'label': child is Text ? child.data : '',
+              'key': a.key
+            };
           }
           return {'type': a.runtimeType.toString()};
         }).toList();
@@ -305,7 +328,8 @@ class NeonElement {
       data['visible'] = bs.visible;
       data['showDragHandle'] = bs.showDragHandle;
       data['borderRadius'] = bs.borderRadius;
-      if (bs.backgroundColor != null) data['backgroundColor'] = bs.backgroundColor!.value;
+      if (bs.backgroundColor != null)
+        data['backgroundColor'] = bs.backgroundColor!.value;
     }
 
     if (sourceWidget is SearchBar) {
@@ -363,16 +387,21 @@ class NeonElement {
       data['padding_left'] = lt.contentPadding.left;
       data['padding_right'] = lt.contentPadding.right;
       if (lt.leading != null) {
-        data['leading'] = lt.leading is Text ? {'type': 'Text', 'text': (lt.leading as Text).data} : {'type': lt.leading.runtimeType.toString()};
+        data['leading'] = lt.leading is Text
+            ? {'type': 'Text', 'text': (lt.leading as Text).data}
+            : {'type': lt.leading.runtimeType.toString()};
       }
       if (lt.title != null) {
         data['title'] = lt.title is Text ? (lt.title as Text).data : '';
       }
       if (lt.subtitle != null) {
-        data['subtitle'] = lt.subtitle is Text ? (lt.subtitle as Text).data : '';
+        data['subtitle'] =
+            lt.subtitle is Text ? (lt.subtitle as Text).data : '';
       }
       if (lt.trailing != null) {
-        data['trailing'] = lt.trailing is Text ? {'type': 'Text', 'text': (lt.trailing as Text).data} : {'type': lt.trailing.runtimeType.toString()};
+        data['trailing'] = lt.trailing is Text
+            ? {'type': 'Text', 'text': (lt.trailing as Text).data}
+            : {'type': lt.trailing.runtimeType.toString()};
       }
     }
 
@@ -381,7 +410,8 @@ class NeonElement {
       data['indeterminate'] = lp.isIndeterminate;
       if (lp.value != null) data['value'] = lp.value;
       if (lp.color != null) data['color'] = lp.color!.value;
-      if (lp.backgroundColor != null) data['backgroundColor'] = lp.backgroundColor!.value;
+      if (lp.backgroundColor != null)
+        data['backgroundColor'] = lp.backgroundColor!.value;
       data['minHeight'] = lp.minHeight;
       data['borderRadius'] = lp.borderRadius;
     }
@@ -391,7 +421,8 @@ class NeonElement {
       data['indeterminate'] = cp.isIndeterminate;
       if (cp.value != null) data['value'] = cp.value;
       if (cp.color != null) data['color'] = cp.color!.value;
-      if (cp.backgroundColor != null) data['backgroundColor'] = cp.backgroundColor!.value;
+      if (cp.backgroundColor != null)
+        data['backgroundColor'] = cp.backgroundColor!.value;
       data['strokeWidth'] = cp.strokeWidth;
       data['size'] = cp.size;
     }

@@ -9,6 +9,6 @@ environment:
 
 dependencies:
   neon_framework:
-    path: /Users/hamzaibrahim/Downloads/NeonFramework-latest-v1-2026-2/NeonFramework-2/neon_framework
+    path: NeonFramework-2/neon_framework
   analyzer: ^6.0.0
-  path: ^1.8.0
+  path: ^1.9.0

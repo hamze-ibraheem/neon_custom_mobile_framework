@@ -1,5 +1,9 @@
 import 'package:neon_framework/neon.dart';
 
+import '../tool/tooling/cli.dart';
+import '../tool/tooling/hot_reload.dart';
+import '../tool/tooling/project_template.dart';
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
