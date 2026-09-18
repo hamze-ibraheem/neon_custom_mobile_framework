@@ -28,6 +28,12 @@ class BuildCommand extends Command<int> {
       help: 'Enable Dart code obfuscation.',
       negatable: false,
     );
+    argParser.addFlag(
+      'release',
+      help: 'Build in release mode.',
+      defaultsTo: true,
+      negatable: true,
+    );
     argParser.addOption(
       'output',
       abbr: 'o',
@@ -39,7 +45,12 @@ class BuildCommand extends Command<int> {
   @override
   Future<int> run() async {
     final args = argResults!;
-    final target = args['target'] as String;
+    var target = args['target'] as String;
+    if (args.rest.contains('apk') || args.rest.contains('android')) {
+      target = 'android';
+    } else if (args.rest.contains('ios') || args.rest.contains('ipa')) {
+      target = 'ios';
+    }
     final flavor = args['flavor'] as String?;
     final obfuscate = args['obfuscate'] as bool;
     final output = args['output'] as String;
