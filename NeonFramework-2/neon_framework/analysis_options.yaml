@@ -1,4 +1,11 @@
 analyzer:
+  exclude:
+    - "**/NeonApp/**"
+    - "**/DerivedData/**"
+    - "**/Build/**"
+    - "**/android/**"
+    - "**/build/**"
+    - "**/.dart_tool/**"
   strong-mode:
     implicit-casts: false
     implicit-dynamic: false

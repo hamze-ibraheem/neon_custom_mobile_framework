@@ -117,3 +117,13 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 
+# Xcode & Build Caches
+**/DerivedData/
+**/Build/
+DerivedData/
+Build/
+**/android/.gradle/
+**/android/app/build/
+**/android/local.properties
+
+

@@ -1,5 +1,13 @@
 include: ../analysis_options.yaml
 
+analyzer:
+  exclude:
+    - "NeonApp/**"
+    - "android/**"
+    - "build/**"
+    - ".dart_tool/**"
+    - "DerivedData/**"
+    - "Build/**"
 
 linter:
   rules:

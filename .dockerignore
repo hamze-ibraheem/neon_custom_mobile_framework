@@ -1,0 +1,28 @@
+# Git
+.git
+.gitignore
+
+# Xcode & iOS builds
+**/DerivedData
+**/Build
+**/*.xcodeproj/*
+!**/*.xcodeproj/project.pbxproj
+!**/*.xcodeproj/xcshareddata
+**/*.xcworkspace/*
+!**/*.xcworkspace/contents.xcworkspacedata
+
+# Android builds
+**/.gradle
+**/app/build
+**/local.properties
+**/captures
+
+# Dart & IDE
+**/.dart_tool
+**/.idea
+**/.vscode
+**/*.iml
+**/doc/api
+*.log
+.DS_Store
+zipFile.zip
