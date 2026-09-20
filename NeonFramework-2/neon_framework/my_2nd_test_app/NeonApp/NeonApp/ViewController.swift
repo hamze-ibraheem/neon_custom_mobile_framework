@@ -23,11 +23,16 @@ class ViewController: UIViewController, UITabBarDelegate {
         fetchUiTree()
     }
     
+    private var lastAppliedRevision: Int = 0
+    private var rootWidgetView: UIView?
+    private var viewRegistry = [String: UIView]()
+    
     private func fetchUiTree() {
-        // The iOS Simulator shares the Mac's localhost automatically!
         guard let url = URL(string: "https://custom-frameworks-neon-framework.iix8qf.easypanel.host/api/tree") else { return }
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
         
-        let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+        let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             guard let self = self else { return }
             
             if let error = error {
@@ -45,22 +50,33 @@ class ViewController: UIViewController, UITabBarDelegate {
                 return
             }
             
-            // Render UI on Main Thread
             DispatchQueue.main.async {
-                self.view.subviews.forEach { $0.removeFromSuperview() }
-                
-                let rootView = self.renderWidget(node: json)
-                rootView.translatesAutoresizingMaskIntoConstraints = false
-                self.view.addSubview(rootView)
-                
-                // Center the rendered UI on the screen
-                NSLayoutConstraint.activate([
-                    rootView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-                    rootView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor)
-                ])
+                if let type = json["type"] as? String, type == "full" {
+                    self.lastAppliedRevision = json["revision"] as? Int ?? 1
+                    let treeNode = (json["tree"] as? [String: Any]) ?? (json["root"] as? [String: Any]) ?? json
+                    self.fullRender(node: treeNode)
+                } else {
+                    self.lastAppliedRevision = 1
+                    self.fullRender(node: json)
+                }
             }
         }
         task.resume()
+    }
+    
+    private func fullRender(node: [String: Any]) {
+        self.viewRegistry.removeAll()
+        self.view.subviews.forEach { $0.removeFromSuperview() }
+        
+        let rootView = self.renderWidget(node: node)
+        self.rootWidgetView = rootView
+        rootView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(rootView)
+        
+        NSLayoutConstraint.activate([
+            rootView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
+            rootView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor)
+        ])
     }
     
     private func showError(_ message: String) {
@@ -1351,8 +1367,14 @@ class ViewController: UIViewController, UITabBarDelegate {
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("\(lastAppliedRevision)", forHTTPHeaderField: "X-Neon-Client-Revision")
+            request.setValue("1", forHTTPHeaderField: "X-Neon-Patch-Version")
             
-            var body: [String: Any] = ["id": buttonId]
+            var body: [String: Any] = [
+                "id": buttonId,
+                "clientRevision": lastAppliedRevision,
+                "patchVersion": 1
+            ]
             if let index = index {
                 body["index"] = index
             }
@@ -1372,33 +1394,172 @@ class ViewController: UIViewController, UITabBarDelegate {
                 
                 guard let self = self, let data = data,
                       let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-                    print("❌ Failed to parse new UI JSON from Dart")
+                    print("❌ Failed to parse response JSON from Dart")
                     return
                 }
                 
                 print("✅ Received response from Dart.")
                 
                 DispatchQueue.main.async {
-                    // Check if the response is a valid widget tree (must have a "type" field)
-                    if json["type"] != nil {
-                        print("🎨 Response is a widget tree. Redrawing screen!")
-                        self.view.subviews.forEach { $0.removeFromSuperview() }
-                        
-                        let rootView = self.renderWidget(node: json)
-                        rootView.translatesAutoresizingMaskIntoConstraints = false
-                        self.view.addSubview(rootView)
-                        
-                        NSLayoutConstraint.activate([
-                            rootView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-                            rootView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor)
-                        ])
+                    let respType = json["type"] as? String ?? ""
+                    if respType == "patch" {
+                        let version = json["version"] as? Int ?? 1
+                        let baseRev = json["baseRevision"] as? Int ?? -1
+                        if version != 1 || baseRev != self.lastAppliedRevision {
+                            print("⚠️ iOS: Mismatched base revision \(baseRev) (expected \(self.lastAppliedRevision)). Initiating full tree recovery.")
+                            self.fetchUiTree()
+                        } else {
+                            self.applyPatch(patchJson: json)
+                        }
+                    } else if respType == "full" {
+                        self.lastAppliedRevision = json["revision"] as? Int ?? (self.lastAppliedRevision + 1)
+                        let treeNode = (json["tree"] as? [String: Any]) ?? (json["root"] as? [String: Any]) ?? json
+                        self.fullRender(node: treeNode)
+                    } else if json["type"] != nil {
+                        self.lastAppliedRevision += 1
+                        self.fullRender(node: json)
                     } else {
-                        print("ℹ️ Response is not a widget tree (likely a status message). Fetching full tree...")
+                        print("ℹ️ Response is not a widget tree. Fetching full tree...")
                         self.fetchUiTree()
                     }
                 }
             }
             task.resume()
+        }
+
+        private func applyPatch(patchJson: [String: Any]) {
+            guard let operations = patchJson["operations"] as? [[String: Any]],
+                  let newRevision = patchJson["revision"] as? Int else {
+                fetchUiTree()
+                return
+            }
+
+            for op in operations {
+                guard let opType = op["op"] as? String,
+                      let path = op["path"] as? String else { continue }
+
+                switch opType {
+                case "update":
+                    let properties = op["properties"] as? [String: Any] ?? [:]
+                    if let targetView = resolveViewAtPath(path: path) {
+                        updateViewProperties(view: targetView, properties: properties)
+                    } else {
+                        print("⚠️ iOS: Target view not found for update at path: \(path). Recovering...")
+                        fetchUiTree()
+                        return
+                    }
+
+                case "replace":
+                    guard let value = op["value"] as? [String: Any] else { continue }
+                    let (parentView, childIndex) = resolveParentAndIndex(path: path)
+                    if let parent = parentView, childIndex >= 0, childIndex < parent.subviews.count {
+                        let oldView = parent.subviews[childIndex]
+                        oldView.removeFromSuperview()
+                        let newView = renderWidget(node: value)
+                        parent.insertSubview(newView, at: childIndex)
+                    } else {
+                        print("⚠️ iOS: Invalid parent/index for replace at path: \(path). Recovering...")
+                        fetchUiTree()
+                        return
+                    }
+
+                case "remove":
+                    let (parentView, childIndex) = resolveParentAndIndex(path: path)
+                    if let parent = parentView, childIndex >= 0, childIndex < parent.subviews.count {
+                        parent.subviews[childIndex].removeFromSuperview()
+                    } else {
+                        print("⚠️ iOS: Invalid parent/index for remove at path: \(path). Recovering...")
+                        fetchUiTree()
+                        return
+                    }
+
+                case "insert":
+                    guard let value = op["value"] as? [String: Any] else { continue }
+                    let (parentView, childIndex) = resolveParentAndIndex(path: path)
+                    if let parent = parentView, childIndex >= 0, childIndex <= parent.subviews.count {
+                        let newView = renderWidget(node: value)
+                        parent.insertSubview(newView, at: childIndex)
+                    } else {
+                        print("⚠️ iOS: Invalid parent/index for insert at path: \(path). Recovering...")
+                        fetchUiTree()
+                        return
+                    }
+
+                default:
+                    break
+                }
+            }
+
+            self.lastAppliedRevision = newRevision
+            print("✅ iOS: Successfully applied patch to revision \(newRevision)")
+        }
+
+        private func resolveViewAtPath(path: String) -> UIView? {
+            if path.isEmpty || path == "/" { return rootWidgetView }
+            let segments = path.split(separator: "/").map { String($0) }
+            var current: UIView? = rootWidgetView
+
+            for seg in segments {
+                if seg == "children" { continue }
+                guard let idx = Int(seg), let view = current, idx < view.subviews.count else {
+                    return nil
+                }
+                current = view.subviews[idx]
+            }
+            return current
+        }
+
+        private func resolveParentAndIndex(path: String) -> (UIView?, Int) {
+            let segments = path.split(separator: "/").map { String($0) }
+            guard let lastSeg = segments.last, let lastIndex = Int(lastSeg) else {
+                return (nil, -1)
+            }
+
+            var current: UIView? = rootWidgetView
+            for i in 0..<(segments.count - 1) {
+                let seg = segments[i]
+                if seg == "children" { continue }
+                guard let idx = Int(seg), let view = current, idx < view.subviews.count else {
+                    return (nil, -1)
+                }
+                current = view.subviews[idx]
+            }
+            return (current, lastIndex)
+        }
+
+        private func updateViewProperties(view: UIView, properties: [String: Any]) {
+            if let label = view as? UILabel {
+                if let text = properties["text"] as? String {
+                    label.text = text
+                }
+                if let color = properties["color"] as? Int {
+                    label.textColor = colorFromARGB(color)
+                }
+                if let fontSize = properties["fontSize"] as? Double {
+                    label.font = label.font.withSize(CGFloat(fontSize))
+                }
+            } else if let textField = view as? UITextField {
+                if let text = properties["text"] as? String ?? properties["value"] as? String {
+                    let selectedRange = textField.selectedTextRange
+                    textField.text = text
+                    textField.selectedTextRange = selectedRange
+                }
+            } else if let toggle = view as? UISwitch {
+                if let val = properties["value"] as? Bool {
+                    toggle.setOn(val, animated: true)
+                }
+            } else if let button = view as? UIButton {
+                if let text = properties["text"] as? String {
+                    button.setTitle(text, for: .normal)
+                }
+            }
+
+            if let visible = properties["visible"] as? Bool {
+                view.isHidden = !visible
+            }
+            if let enabled = properties["enabled"] as? Bool {
+                view.isUserInteractionEnabled = enabled
+            }
         }
 }
 

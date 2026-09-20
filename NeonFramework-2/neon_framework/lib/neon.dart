@@ -25,6 +25,7 @@ export 'src/widgets/app_bar.dart';
 export 'src/widgets/container.dart';
 export 'src/widgets/layout.dart';
 export 'src/widgets/widget_tree.dart';
+export 'src/widgets/tree_diff.dart';
 export 'src/widgets/card.dart';
 export 'src/widgets/dialog.dart';
 export 'src/widgets/bottom_sheet.dart';

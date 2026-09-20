@@ -95,11 +95,15 @@ class NeonElement {
     String type = widget is LeafWidget
         ? (widget as LeafWidget).type
         : widget.runtimeType.toString();
-    Map<String, dynamic> data = {
+    final Map<String, dynamic> data = {
       'id': id,
       'type': type,
       'sourceType': sourceWidget.runtimeType.toString(),
     };
+    final String? stableKey = sourceWidget.key ?? widget.key;
+    if (stableKey != null && stableKey.isNotEmpty) {
+      data['key'] = stableKey;
+    }
 
     // Export properties (primitive handling)
     if (widget is Text) {

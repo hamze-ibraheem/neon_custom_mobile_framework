@@ -64,6 +64,9 @@ class NeonConfig {
   /// The port for the UI server.
   final int port;
 
+  /// Whether widget tree diffing and incremental patch responses are enabled.
+  final bool enableDiffing;
+
   /// Custom key-value configuration data.
   final Map<String, dynamic> custom;
 
@@ -73,6 +76,7 @@ class NeonConfig {
     this.buildFlavor,
     this.featureFlags = const NeonFeatureFlags(),
     this.port = 8080,
+    this.enableDiffing = true,
     this.custom = const {},
   });
 
@@ -91,6 +95,7 @@ class NeonConfig {
     NeonBuildFlavor? buildFlavor,
     NeonFeatureFlags? featureFlags,
     int? port,
+    bool? enableDiffing,
     Map<String, dynamic>? custom,
   }) {
     return NeonConfig(
@@ -98,11 +103,12 @@ class NeonConfig {
       buildFlavor: buildFlavor ?? this.buildFlavor,
       featureFlags: featureFlags ?? this.featureFlags,
       port: port ?? this.port,
+      enableDiffing: enableDiffing ?? this.enableDiffing,
       custom: custom ?? this.custom,
     );
   }
 
   @override
   String toString() =>
-      'NeonConfig(env: $environment, flavor: $buildFlavor, flags: $featureFlags)';
+      'NeonConfig(env: $environment, flavor: $buildFlavor, flags: $featureFlags, diffing: $enableDiffing)';
 }

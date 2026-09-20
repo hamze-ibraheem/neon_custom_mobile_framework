@@ -32,6 +32,11 @@ class MainActivity : Activity() {
     fetchUiTree()
   }
 
+  private var lastAppliedRevision: Int = 0
+  private var rootWidgetView: View? = null
+  private var currentScrollView: ScrollView? = null
+  private val viewRegistry = HashMap<String, View>()
+
   private fun fetchUiTree() {
     thread {
       try {
@@ -39,22 +44,24 @@ class MainActivity : Activity() {
         val url = URL("https://custom-frameworks-neon-framework.iix8qf.easypanel.host/api/tree")
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
+        connection.setRequestProperty("Accept", "application/json")
 
         val reader = BufferedReader(InputStreamReader(connection.inputStream))
         val response = reader.readText()
         reader.close()
 
-        // Parse JSON
-        val rootNode = JSONObject(response)
+        val json = JSONObject(response)
 
         // Render on Main Thread
         runOnUiThread {
-          val rootView = renderWidget(rootNode)
-
-          // Wrap in ScrollView for safety
-          val scrollView = ScrollView(this)
-          scrollView.addView(rootView)
-          setContentView(scrollView)
+          if (json.optString("type") == "full") {
+            lastAppliedRevision = json.optInt("revision", 1)
+            val tree = json.optJSONObject("tree") ?: json.optJSONObject("root") ?: json
+            fullRender(tree)
+          } else {
+            lastAppliedRevision = 1
+            fullRender(json)
+          }
         }
 
       } catch (e: Exception) {
@@ -68,6 +75,17 @@ class MainActivity : Activity() {
     }
   }
 
+  private fun fullRender(rootNode: JSONObject) {
+    viewRegistry.clear()
+    val rootView = renderWidget(rootNode)
+    rootWidgetView = rootView
+
+    val scrollView = ScrollView(this)
+    currentScrollView = scrollView
+    scrollView.addView(rootView)
+    setContentView(scrollView)
+  }
+
   private fun sendAction(id: String, index: Int? = null, value: Any? = null) {
     thread {
       try {
@@ -76,9 +94,13 @@ class MainActivity : Activity() {
         connection.requestMethod = "POST"
         connection.doOutput = true
         connection.setRequestProperty("Content-Type", "application/json")
+        connection.setRequestProperty("X-Neon-Client-Revision", lastAppliedRevision.toString())
+        connection.setRequestProperty("X-Neon-Patch-Version", "1")
 
         val json = JSONObject()
         json.put("id", id)
+        json.put("clientRevision", lastAppliedRevision)
+        json.put("patchVersion", 1)
         if (index != null) {
           json.put("index", index)
         }
@@ -92,23 +114,174 @@ class MainActivity : Activity() {
 
         val responseCode = connection.responseCode
         if (responseCode == 200) {
-          // Read the response JSON (contains updated widget tree)
           val reader = BufferedReader(InputStreamReader(connection.inputStream))
           val response = reader.readText()
           reader.close()
-          
-          // Parse and re-render the updated tree
-          val rootNode = JSONObject(response)
+
+          val respJson = JSONObject(response)
+          val respType = respJson.optString("type")
+
           runOnUiThread {
-            val rootView = renderWidget(rootNode)
-            val scrollView = ScrollView(this)
-            scrollView.addView(rootView)
-            setContentView(scrollView)
+            if (respType == "patch") {
+              val patchVersion = respJson.optInt("version", 1)
+              val baseRevision = respJson.optInt("baseRevision", -1)
+              if (patchVersion != 1 || baseRevision != lastAppliedRevision) {
+                println("⚠️ Android: Mismatched base revision $baseRevision (expected $lastAppliedRevision). Initiating full tree recovery.")
+                fetchUiTree()
+              } else {
+                applyPatch(respJson)
+              }
+            } else if (respType == "full") {
+              lastAppliedRevision = respJson.optInt("revision", lastAppliedRevision + 1)
+              val tree = respJson.optJSONObject("tree") ?: respJson.optJSONObject("root") ?: respJson
+              fullRender(tree)
+            } else {
+              lastAppliedRevision++
+              fullRender(respJson)
+            }
           }
         }
       } catch (e: Exception) {
         e.printStackTrace()
       }
+    }
+  }
+
+  private fun applyPatch(patchJson: JSONObject) {
+    try {
+      val operations = patchJson.optJSONArray("operations") ?: return
+      val newRevision = patchJson.getInt("revision")
+
+      for (i in 0 until operations.length()) {
+        val op = operations.getJSONObject(i)
+        val opType = op.getString("op")
+        val path = op.getString("path")
+
+        when (opType) {
+          "update" -> {
+            val properties = op.optJSONObject("properties") ?: JSONObject()
+            val targetView = resolveViewAtPath(path)
+            if (targetView != null) {
+              updateViewProperties(targetView, properties)
+            } else {
+              println("⚠️ Android: Target view not found for update at path: $path. Recovering...")
+              fetchUiTree()
+              return
+            }
+          }
+          "replace" -> {
+            val value = op.getJSONObject("value")
+            val (parentView, childIndex) = resolveParentAndIndex(path)
+            if (parentView != null && childIndex >= 0 && childIndex < parentView.childCount) {
+              val newView = renderWidget(value)
+              parentView.removeViewAt(childIndex)
+              parentView.addView(newView, childIndex)
+            } else {
+              println("⚠️ Android: Invalid parent/index for replace at path: $path. Recovering...")
+              fetchUiTree()
+              return
+            }
+          }
+          "remove" -> {
+            val (parentView, childIndex) = resolveParentAndIndex(path)
+            if (parentView != null && childIndex >= 0 && childIndex < parentView.childCount) {
+              parentView.removeViewAt(childIndex)
+            } else {
+              println("⚠️ Android: Invalid parent/index for remove at path: $path. Recovering...")
+              fetchUiTree()
+              return
+            }
+          }
+          "insert" -> {
+            val value = op.getJSONObject("value")
+            val (parentView, childIndex) = resolveParentAndIndex(path)
+            if (parentView != null && childIndex >= 0 && childIndex <= parentView.childCount) {
+              val newView = renderWidget(value)
+              parentView.addView(newView, childIndex)
+            } else {
+              println("⚠️ Android: Invalid parent/index for insert at path: $path. Recovering...")
+              fetchUiTree()
+              return
+            }
+          }
+        }
+      }
+      lastAppliedRevision = newRevision
+      println("✅ Android: Successfully applied patch to revision $newRevision")
+    } catch (e: Exception) {
+      println("❌ Android: Patch application failed: ${e.message}. Recovering via full render...")
+      fetchUiTree()
+    }
+  }
+
+  private fun resolveViewAtPath(path: String): View? {
+    if (path.isEmpty() || path == "/") return rootWidgetView
+    val segments = path.split("/").filter { it.isNotEmpty() }
+    var current: View? = rootWidgetView
+
+    for (seg in segments) {
+      if (seg == "children") continue
+      val idx = seg.toIntOrNull()
+      if (idx != null && current is ViewGroup && idx < current.childCount) {
+        current = current.getChildAt(idx)
+      } else {
+        return null
+      }
+    }
+    return current
+  }
+
+  private fun resolveParentAndIndex(path: String): Pair<ViewGroup?, Int> {
+    val segments = path.split("/").filter { it.isNotEmpty() }
+    if (segments.isEmpty()) return Pair(null, -1)
+    val lastIndex = segments.last().toIntOrNull() ?: return Pair(null, -1)
+
+    var current: View? = rootWidgetView
+    for (i in 0 until segments.size - 1) {
+      val seg = segments[i]
+      if (seg == "children") continue
+      val idx = seg.toIntOrNull()
+      if (idx != null && current is ViewGroup && idx < current.childCount) {
+        current = current.getChildAt(idx)
+      } else {
+        return Pair(null, -1)
+      }
+    }
+    return Pair(current as? ViewGroup, lastIndex)
+  }
+
+  private fun updateViewProperties(view: View, properties: JSONObject) {
+    if (view is TextView) {
+      if (properties.has("text")) {
+        val newText = properties.getString("text")
+        if (view is android.widget.EditText) {
+          val cursor = view.selectionStart
+          if (view.text.toString() != newText) {
+            view.setText(newText)
+            view.setSelection(minOf(cursor, newText.length))
+          }
+        } else {
+          view.text = newText
+        }
+      }
+      if (properties.has("color")) {
+        view.setTextColor(properties.getInt("color"))
+      }
+      if (properties.has("fontSize")) {
+        view.textSize = properties.getDouble("fontSize").toFloat()
+      }
+    }
+
+    if (view is android.widget.CompoundButton && properties.has("value")) {
+      view.isChecked = properties.getBoolean("value")
+    }
+
+    if (properties.has("enabled")) {
+      view.isEnabled = properties.getBoolean("enabled")
+    }
+
+    if (properties.has("visible")) {
+      view.visibility = if (properties.getBoolean("visible")) View.VISIBLE else View.GONE
     }
   }
 
