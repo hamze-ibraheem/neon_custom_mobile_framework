@@ -506,6 +506,19 @@ class NeonElement {
       if (pos.bottom != null) data['bottom'] = _sanitizeDouble(pos.bottom);
     }
 
+    if (widget is Stack) {
+      data['fit'] = (widget as Stack).fit.name;
+    }
+
+    if (widget is BadgeLabel) {
+      final bl = widget as BadgeLabel;
+      data['backgroundColor'] = bl.backgroundColor.value;
+      data['labelColor'] = bl.labelColor.value;
+      if (bl.label is Text) {
+        data['label'] = (bl.label as Text).data;
+      }
+    }
+
     // Recursively export children
     data['children'] = children.map((c) => c.toJson()).toList();
 

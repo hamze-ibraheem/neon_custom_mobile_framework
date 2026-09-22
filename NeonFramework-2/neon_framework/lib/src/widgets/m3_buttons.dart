@@ -2,6 +2,7 @@ import 'package:neon_framework/src/widgets/widget.dart';
 import 'package:neon_framework/src/widgets/build_context.dart';
 import 'package:neon_framework/src/widgets/button.dart';
 import 'package:neon_framework/src/widgets/primitives.dart';
+import 'package:neon_framework/src/widgets/text.dart';
 
 /// A Material 3 Filled Button.
 class FilledButton extends NeonWidget {
@@ -18,11 +19,27 @@ class FilledButton extends NeonWidget {
 
   @override
   NeonWidget build(NeonBuildContext context) {
+    NeonWidget effectiveChild = child;
+    if (child is Text) {
+      final t = child as Text;
+      if (t.style.color == NeonColor.black) {
+        effectiveChild = Text(
+          t.data,
+          style: NeonTextStyle(
+            fontSize: t.style.fontSize,
+            color: NeonColor.white,
+            fontWeight: t.style.fontWeight == NeonFontWeight.normal
+                ? NeonFontWeight.bold
+                : t.style.fontWeight,
+          ),
+        );
+      }
+    }
     return Button(
       key: key,
       onPressed: onPressed,
-      color: color ?? NeonColor.blue,
-      child: child,
+      color: color ?? NeonColor.primary,
+      child: effectiveChild,
     );
   }
 }
