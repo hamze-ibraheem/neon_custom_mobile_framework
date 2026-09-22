@@ -21,6 +21,7 @@ export 'package:neon_framework/src/widgets/selection_controls.dart';
 export 'package:neon_framework/src/widgets/slider.dart';
 export 'src/widgets/remote_widget.dart';
 export 'src/widgets/navigation.dart';
+export 'src/navigation/navigation.dart';
 export 'src/widgets/app_bar.dart';
 export 'src/widgets/container.dart';
 export 'src/widgets/layout.dart';
