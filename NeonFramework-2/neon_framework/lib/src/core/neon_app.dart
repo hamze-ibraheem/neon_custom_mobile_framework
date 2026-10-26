@@ -28,6 +28,7 @@ import 'package:neon_framework/src/widgets/progress_indicator.dart';
 import 'package:neon_framework/src/widgets/tooltip.dart';
 import 'package:neon_framework/src/widgets/snack_bar.dart';
 import 'package:neon_framework/src/widgets/scroll_view.dart';
+import 'package:neon_framework/src/widgets/tree_diff.dart';
 
 class NeonApp {
   static final Map<String, NeonState> globalStateStore = {};
@@ -49,12 +50,20 @@ class NeonApp {
   late final NeonBuildContext _rootContext;
   bool _isRunning = false;
   HttpServer? _server;
+  int _currentRevision = 1;
+  Map<String, dynamic>? _lastTreeSnapshot;
 
   /// The widget tree managed by this application.
   NeonWidgetTree get widgetTree => _widgetTree;
 
   /// The port the server is bound to.
   int get port => _server?.port ?? 0;
+
+  /// The current UI revision number.
+  int get currentRevision => _currentRevision;
+
+  /// The last serialized widget tree snapshot.
+  Map<String, dynamic>? get lastTreeSnapshot => _lastTreeSnapshot;
 
   NeonApp._({
     required this.root,
@@ -90,6 +99,8 @@ class NeonApp {
 
     // 1. Build the tree
     _widgetTree.buildTree(root, _rootContext);
+    _currentRevision = 1;
+    _lastTreeSnapshot = _widgetTree.root?.toJson() ?? {};
 
     // 2. Print the status banner
     _printBanner();
@@ -133,6 +144,13 @@ class NeonApp {
       if (request.method == 'OPTIONS') {
         request.response
           ..statusCode = HttpStatus.ok
+          ..close();
+        return;
+      }
+
+      if (request.uri.path == '/favicon.ico') {
+        request.response
+          ..statusCode = HttpStatus.noContent
           ..close();
         return;
       }
@@ -297,10 +315,87 @@ class NeonApp {
         }
 
         final newJsonTree = _widgetTree.root?.toJson() ?? {};
-        request.response
-          ..headers.contentType = ContentType.json
-          ..write(jsonEncode(newJsonTree))
-          ..close();
+        final bool diffingEnabled =
+            config.enableDiffing && !config.featureFlags.isEnabled('disable_diffing');
+
+        final dynamic rawClientRev = params['clientRevision'] ??
+            request.headers.value('X-Neon-Client-Revision');
+        final int? clientRevision = rawClientRev is int
+            ? rawClientRev
+            : int.tryParse(rawClientRev?.toString() ?? '');
+
+        final dynamic rawPatchVer = params['patchVersion'] ??
+            request.headers.value('X-Neon-Patch-Version');
+        final int patchVersion = rawPatchVer is int
+            ? rawPatchVer
+            : (int.tryParse(rawPatchVer?.toString() ?? '') ?? 1);
+
+        final bool isRecovery = params['recovery'] == true ||
+            request.headers.value('X-Neon-Recovery') == 'true';
+
+        _currentRevision++;
+        final int newRevision = _currentRevision;
+        final int expectedBaseRevision = newRevision - 1;
+
+        bool shouldSendPatch = false;
+        WidgetTreePatch? patch;
+
+        if (diffingEnabled &&
+            !isRecovery &&
+            patchVersion == 1 &&
+            clientRevision != null &&
+            _lastTreeSnapshot != null) {
+          if (clientRevision == expectedBaseRevision) {
+            patch = NeonWidgetTreeDiff.diff(
+              _lastTreeSnapshot!,
+              newJsonTree,
+              revision: newRevision,
+              baseRevision: clientRevision,
+            );
+            shouldSendPatch = true;
+          } else {
+            print(
+                '⚠️ Revision mismatch: client=$clientRevision, expected=$expectedBaseRevision. Returning full tree fallback.');
+          }
+        }
+
+        if (shouldSendPatch && patch != null) {
+          _lastTreeSnapshot = newJsonTree;
+          final patchPayload = patch.toJson();
+          print(
+              '⚡ Sending patch update (rev: $newRevision, base: $clientRevision, ops: ${patch.operations.length})');
+          request.response
+            ..headers.contentType = ContentType.json
+            ..headers.add('X-Neon-Revision', '$newRevision')
+            ..headers.add('X-Neon-Response-Type', 'patch')
+            ..write(jsonEncode(patchPayload))
+            ..close();
+        } else {
+          _lastTreeSnapshot = newJsonTree;
+          final fullPayload = {
+            'type': 'full',
+            'version': 1,
+            'revision': newRevision,
+            'tree': newJsonTree,
+            'root': newJsonTree,
+          };
+          if (!diffingEnabled) {
+            fullPayload['fallbackReason'] = 'diffing_disabled';
+          } else if (isRecovery) {
+            fullPayload['fallbackReason'] = 'recovery_requested';
+          } else if (_lastTreeSnapshot == null) {
+            fullPayload['fallbackReason'] = 'no_previous_snapshot';
+          } else if (clientRevision != null && clientRevision != expectedBaseRevision) {
+            fullPayload['fallbackReason'] = 'revision_mismatch';
+          }
+          print('🌳 Sending full tree (rev: $newRevision)');
+          request.response
+            ..headers.contentType = ContentType.json
+            ..headers.add('X-Neon-Revision', '$newRevision')
+            ..headers.add('X-Neon-Response-Type', 'full')
+            ..write(jsonEncode(fullPayload))
+            ..close();
+        }
         return;
       }
 
@@ -328,11 +423,21 @@ class NeonApp {
       // ✅ JSON API: Send the Tree as JSON
       if (request.method == 'GET' && request.uri.path == '/api/tree') {
         final jsonTree = _widgetTree.root?.toJson() ?? {};
+        _lastTreeSnapshot = jsonTree;
+        final responsePayload = {
+          'type': 'full',
+          'version': 1,
+          'revision': _currentRevision,
+          'tree': jsonTree,
+          'root': jsonTree,
+        };
         request.response
           ..headers.contentType = ContentType.json
-          ..write(jsonEncode(jsonTree))
+          ..headers.add('X-Neon-Revision', '$_currentRevision')
+          ..headers.add('X-Neon-Response-Type', 'full')
+          ..write(jsonEncode(responsePayload))
           ..close();
-        print('📲 Device requested UI Frame (Root)');
+        print('📲 Device requested UI Frame (Root, Revision: $_currentRevision)');
         return;
       }
 
@@ -393,6 +498,8 @@ class NeonApp {
 
   /// Resets the application instance, useful for testing.
   static void reset() {
+    _instance?._currentRevision = 1;
+    _instance?._lastTreeSnapshot = null;
     _instance?.dispose();
     _instance = null;
     globalStateStore.clear();
@@ -592,12 +699,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </div>
 <script>
 const API=window.location.origin;
+let currentRevision=0;
 let tree=null;
 
 async function fetchTree(){
   try{
     const r=await fetch(API+'/api/tree');
-    tree=await r.json();
+    const data=await r.json();
+    if(data.type==='full'||data.tree||data.root){
+      currentRevision=data.revision||1;
+      tree=data.tree||data.root||data;
+    }else{
+      tree=data;
+    }
     renderApp(tree);
   }catch(e){
     document.getElementById('content').innerHTML='<div style="color:red;padding:20px">Error: '+e.message+'</div>';
@@ -609,15 +723,88 @@ async function sendAction(id,params={}){
   if(actionLock)return;
   actionLock=true;
   try{
-    const body=JSON.stringify({id,...params});
+    const body=JSON.stringify({id,clientRevision:currentRevision,patchVersion:1,...params});
     const r=await fetch(API+'/action',{method:'POST',headers:{'Content-Type':'application/json'},body});
-    tree=await r.json();
-    renderApp(tree);
-  }catch(e){console.error('Action error:',e)}
+    const data=await r.json();
+    if(data.type==='patch'){
+      currentRevision=data.revision||(currentRevision+1);
+      tree=applyPatchToTree(tree,data.operations||[]);
+      renderApp(tree);
+    }else if(data.type==='full'||data.tree||data.root){
+      currentRevision=data.revision||(currentRevision+1);
+      tree=data.tree||data.root||data;
+      renderApp(tree);
+    }else{
+      tree=data;
+      renderApp(tree);
+    }
+  }catch(e){
+    console.error('Action error:',e);
+    fetchTree();
+  }
   finally{actionLock=false;}
 }
 
+function applyPatchToTree(root,operations){
+  if(!operations||!Array.isArray(operations))return root;
+  let targetRoot=root;
+  for(const op of operations){
+    if(!op.path||op.path==='/'||op.path===''){
+      if(op.op==='replace'&&op.value){
+        targetRoot=JSON.parse(JSON.stringify(op.value));
+      }else if(op.op==='update'&&op.properties){
+        for(const [k,v] of Object.entries(op.properties)){
+          if(v===null)delete targetRoot[k];
+          else targetRoot[k]=v;
+        }
+      }
+      continue;
+    }
+    const segments=op.path.split('/').filter(s=>s.length>0);
+    let current=targetRoot;
+    for(let i=0;i<segments.length-1;i++){
+      const seg=segments[i];
+      if(Array.isArray(current)){
+        current=current[parseInt(seg,10)];
+      }else if(current&&typeof current==='object'){
+        current=current[seg];
+      }
+    }
+    const lastSeg=segments[segments.length-1];
+    if(op.op==='update'&&op.properties){
+      const target=Array.isArray(current)?current[parseInt(lastSeg,10)]:(current?current[lastSeg]:null);
+      if(target&&typeof target==='object'){
+        for(const [k,v] of Object.entries(op.properties)){
+          if(v===null)delete target[k];
+          else target[k]=v;
+        }
+      }
+    }else if(op.op==='replace'&&op.value!==undefined){
+      if(Array.isArray(current)){
+        current[parseInt(lastSeg,10)]=JSON.parse(JSON.stringify(op.value));
+      }else if(current&&typeof current==='object'){
+        current[lastSeg]=JSON.parse(JSON.stringify(op.value));
+      }
+    }else if(op.op==='remove'){
+      if(Array.isArray(current)){
+        current.splice(parseInt(lastSeg,10),1);
+      }else if(current&&typeof current==='object'){
+        delete current[lastSeg];
+      }
+    }else if(op.op==='insert'&&op.value!==undefined){
+      if(Array.isArray(current)){
+        current.splice(parseInt(lastSeg,10),0,JSON.parse(JSON.stringify(op.value)));
+      }
+    }
+  }
+  return targetRoot;
+}
+
 function renderApp(node){
+  if(!node)return;
+  if(node.type==='full'&&(node.tree||node.root)){
+    node=node.tree||node.root;
+  }
   if(!node||!node.type)return;
   const appBar=document.getElementById('app-bar');
   const content=document.getElementById('content');

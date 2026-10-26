@@ -95,11 +95,15 @@ class NeonElement {
     String type = widget is LeafWidget
         ? (widget as LeafWidget).type
         : widget.runtimeType.toString();
-    Map<String, dynamic> data = {
+    final Map<String, dynamic> data = {
       'id': id,
       'type': type,
       'sourceType': sourceWidget.runtimeType.toString(),
     };
+    final String? stableKey = sourceWidget.key ?? widget.key;
+    if (stableKey != null && stableKey.isNotEmpty) {
+      data['key'] = stableKey;
+    }
 
     // Export properties (primitive handling)
     if (widget is Text) {
@@ -500,6 +504,19 @@ class NeonElement {
       if (pos.top != null) data['top'] = _sanitizeDouble(pos.top);
       if (pos.right != null) data['right'] = _sanitizeDouble(pos.right);
       if (pos.bottom != null) data['bottom'] = _sanitizeDouble(pos.bottom);
+    }
+
+    if (widget is Stack) {
+      data['fit'] = (widget as Stack).fit.name;
+    }
+
+    if (widget is BadgeLabel) {
+      final bl = widget as BadgeLabel;
+      data['backgroundColor'] = bl.backgroundColor.value;
+      data['labelColor'] = bl.labelColor.value;
+      if (bl.label is Text) {
+        data['label'] = (bl.label as Text).data;
+      }
     }
 
     // Recursively export children

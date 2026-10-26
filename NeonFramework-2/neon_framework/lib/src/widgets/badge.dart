@@ -37,7 +37,7 @@ class Badge extends StatelessWidget {
     return Stack(
       children: [
         child,
-        _BadgeLabel(
+        BadgeLabel(
           label: label,
           backgroundColor: backgroundColor,
           labelColor: labelColor,
@@ -47,13 +47,13 @@ class Badge extends StatelessWidget {
   }
 }
 
-/// Internal primitive for the badge label anchored to its parent.
-class _BadgeLabel extends LeafWidget {
+/// Primitive for the badge label anchored to its parent or rendered inline.
+class BadgeLabel extends LeafWidget {
   final NeonWidget? label;
   final NeonColor backgroundColor;
   final NeonColor labelColor;
 
-  const _BadgeLabel({
+  const BadgeLabel({
     this.label,
     required this.backgroundColor,
     required this.labelColor,

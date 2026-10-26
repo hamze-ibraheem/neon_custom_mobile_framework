@@ -24,8 +24,20 @@ class NeonColor {
   /// Opaque green.
   static const NeonColor green = NeonColor(0xFF00FF00);
 
-  /// Opaque blue.
-  static const NeonColor blue = NeonColor(0xFF0000FF);
+  /// Opaque blue / Modern Primary Indigo.
+  static const NeonColor blue = NeonColor(0xFF4F46E5);
+
+  /// Modern Design System Color Tokens
+  static const NeonColor primary = NeonColor(0xFF4F46E5);
+  static const NeonColor primaryLight = NeonColor(0xFFEEF2FF);
+  static const NeonColor secondary = NeonColor(0xFF64748B);
+  static const NeonColor surface = NeonColor(0xFFF8FAFC);
+  static const NeonColor surfaceCard = NeonColor(0xFFFFFFFF);
+  static const NeonColor textPrimary = NeonColor(0xFF0F172A);
+  static const NeonColor textSecondary = NeonColor(0xFF64748B);
+  static const NeonColor success = NeonColor(0xFF10B981);
+  static const NeonColor warning = NeonColor(0xFFF59E0B);
+  static const NeonColor danger = NeonColor(0xFFEF4444);
 
   /// Opaque grey.
   static const NeonColor grey = NeonColor(0xFF808080);

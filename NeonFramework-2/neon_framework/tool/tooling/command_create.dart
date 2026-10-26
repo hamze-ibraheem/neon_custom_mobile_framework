@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'cli.dart';
 import 'project_template.dart';
 import 'android/android_generator.dart';
+import 'ios/ios_generator.dart';
 
 class CreateCommand extends Command<int> {
   @override
@@ -69,7 +71,11 @@ class CreateCommand extends Command<int> {
         return 0;
 
       case 'ios':
-        NeonLogger.warning('iOS platform generation not implemented yet.');
+        NeonLogger.step('Generating iOS project skeleton & Xcode Cloud configuration...');
+        IosGenerator(projectRoot: Directory.current.path).generate();
+        NeonLogger.success('iOS platform files and Xcode Cloud CI scripts configured.');
+        NeonLogger.info('');
+        NeonLogger.step('Next: neon build ios --xcode-cloud');
         return 0;
 
       default:
