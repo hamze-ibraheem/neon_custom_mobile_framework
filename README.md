@@ -2,17 +2,33 @@
 
 > **A modern, high-performance, standalone Dart UI framework for Android & iOS — built completely independent of Flutter.**
 
-[![Dart SDK](https://img.shields.io/badge/Dart-3.0+-0175C2?logo=dart&logoColor=white)](https://dart.dev)
-[![Platforms](https://img.shields.io/badge/Platforms-Android%20%7C%20iOS-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
-[![Tests](https://img.shields.io/badge/Tests-403%20Passing-brightgreen?style=flat)]()
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Architecture](https://img.shields.io/badge/Architecture-HTTP%20JSON%20Bridge%20%2B%20Tree%20Diffing-orange)]()
+<p align="center">
+  <img src="assets/neon_hero_banner.jpg" alt="Neon Framework - The Ultimate Flutter Alternative" width="460" />
+</p>
+
+<p align="center">
+  <a href="https://neonframework.dev"><img src="https://img.shields.io/badge/Website-neonframework.dev-6C5CE7?logo=googlechrome&logoColor=white" alt="Website" /></a>
+  <a href="https://docs.neonframework.dev/docs/quick-start"><img src="https://img.shields.io/badge/Docs-Quick%20Start-00CEC9?logo=googledocs&logoColor=white" alt="Docs" /></a>
+  <a href="https://dart.dev"><img src="https://img.shields.io/badge/Dart-3.0+-0175C2?logo=dart&logoColor=white" alt="Dart SDK" /></a>
+  <a href="https://developer.android.com"><img src="https://img.shields.io/badge/Platforms-Android%20%7C%20iOS-3DDC84?logo=android&logoColor=white" alt="Platforms" /></a>
+  <img src="https://img.shields.io/badge/Tests-403%20Passing-brightgreen?style=flat" alt="Tests" />
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License" /></a>
+  <img src="https://img.shields.io/badge/Architecture-HTTP%20JSON%20Bridge%20%2B%20Tree%20Diffing-orange" alt="Architecture" />
+</p>
+
+<p align="center">
+  🌐 <a href="https://neonframework.dev"><strong>neonframework.dev</strong></a> &nbsp;&bull;&nbsp; 
+  📚 <a href="https://docs.neonframework.dev/docs/quick-start"><strong>Official Documentation & Quick Start</strong></a>
+</p>
 
 ---
 
 ## 📖 Table of Contents
 
 - [Overview](#-overview)
+- [Architectural Advantage: Why Neon Outperforms](#-architectural-advantage-why-neon-outperforms-traditional-frameworks)
+- [Neon vs. Flutter Comparison](#-neon-vs-flutter-at-a-glance-comparison)
+- [Featured Demo: Neon Task Studio App](#-featured-demo-neon-task-studio-app)
 - [Key Features](#-key-features)
 - [System Architecture](#-system-architecture)
 - [Core Layers](#-core-layers)
@@ -36,6 +52,7 @@
   - [4. Web Preview & Inspection](#4-web-preview--inspection)
 - [Testing](#-testing)
 - [Contributing & Best Practices](#-contributing--best-practices)
+- [Copyright & Ownership](#-copyright--ownership)
 - [License](#-license)
 
 ---
@@ -54,6 +71,94 @@ Instead of drawing pixels to a canvas or embedding web views, Neon runs your bus
 - **Unified Reactive Paradigm**: Fine-grained reactive state using signals (`NeonSignal`, `NeonComputed`, `NeonEffect`) and asynchronous state containers (`NeonAsyncValue`).
 - **Complete Application Stack**: Includes declarative routing, local SQLite with migrations, typed key-value storage, HTTP client with interceptors, WebSocket client, offline caching policies, and an extensible plugin system.
 - **Flutter Migration Path**: An AST-based transpiler transforms existing Flutter widget code into idiomatic Neon code automatically.
+
+---
+
+## 🚀 Architectural Advantage: Why Neon Outperforms Traditional Frameworks
+
+By eliminating heavy C++ canvas engines and fragile JS bridges, Neon delivers direct native fidelity with Dart developer speed.
+
+<p align="center">
+  <img src="assets/why_neon_outperforms.jpg" alt="Why Neon Outperforms Traditional Frameworks" width="850" />
+</p>
+
+| Feature | Neon Framework <br><sup>⭐ **RECOMMENDED**</sup> | Flutter | React Native |
+|---|---|---|---|
+| **Engine Footprint** | ✅ **0 MB** (No embedded engine) | 15MB – 25MB (Skia/Impeller) | 8MB – 12MB (Hermes JS Engine) |
+| **Render Target** | ✅ **100% Native Views** (Kotlin & UIKit) | Canvas Emulation (Skia pixels) | Native Views via Async Bridge |
+| **Hot Reload Latency** | ✅ **< 100ms** (3-Tier Engine) | 200ms – 600ms | 300ms – 800ms (Fast Refresh) |
+| **Logic Language** | ✅ **Dart 3** (Sound Null Safety) | Dart 3 | JavaScript / TypeScript |
+| **Code Migration** | ✅ **Automated AST Transpiler** | Manual rewrite | Manual rewrite |
+| **Platform Accessibility** | ✅ **100% Native OS Support** | Custom accessibility bridge | Native accessibility tree |
+
+---
+
+## ⚡ Neon vs. Flutter: At a Glance Comparison
+
+<p align="center">
+  <img src="assets/neon_vs_flutter.jpg" alt="Neon vs Flutter At a Glance Comparison" width="460" />
+</p>
+
+| Dimension | Neon Framework | Flutter |
+|---|---|---|
+| **Rendering Backend** | **Native UI Components** (Platform Views) | Canvas Painter (Impeller / Skia) |
+| **View Lifecycle** | **Cached View Management** (No re-render on reopen) | Frequent widget tree rebuilds |
+| **State Management** | **Embedded Natively in SDK** (Signals + AsyncValue) | Requires external packages (Riverpod, Bloc, Provider) |
+| **Binary Size (APK/IPA)** | **Ultra-compact** (Zero engine bloat) | Larger base engine footprint |
+| **Build & Run Time** | **Rapid Compilation & Deploy** | Slower initial and clean builds |
+| **Component Architecture** | **Lightweight Custom SDK** | Heavy Material / Cupertino layer abstractions |
+
+---
+
+## 📱 Featured Demo: Neon Task Studio App
+
+> **Live Reference Repository**: [`https://github.com/hamze-ibraheem/neon_to_do_list_app.git`](https://github.com/hamze-ibraheem/neon_to_do_list_app.git)
+
+**Neon Task Studio** is a complete, production-grade productivity application built entirely with **Neon Framework v0.2.0**. It serves as a real-world reference implementation demonstrating pure Dart reactive state management, high-frequency JSON tree diffing, and 100% native view rendering on mobile devices with zero Flutter dependencies.
+
+<p align="center">
+  <img src="assets/demo_task_studio.jpg" width="23%" alt="Task Studio Main Screen" />
+  &nbsp;
+  <img src="assets/demo_create_task.png" width="23%" alt="Create Task Modal" />
+  &nbsp;
+  <img src="assets/demo_analytics.png" width="23%" alt="Productivity Analytics" />
+  &nbsp;
+  <img src="assets/demo_settings_diagnostics.jpg" width="23%" alt="Settings & Diffing Diagnostics" />
+</p>
+
+### What This Demo Showcases
+
+1. **Task Management & Quick Actions** (Screen 1):
+   - Dynamic **Progress Overview** bar calculating completion percentages in real time.
+   - Category filtering with responsive chips (**Work**, **Personal**, **Study**, **Shopping**).
+   - Fast inline task creation with priority levels (**High**, **Medium**, **Low**).
+   - Interactive task cards with custom checkboxes, category tags, priority indicators, and edit/delete actions.
+
+2. **Modal Task Creation Dialog** (Screen 2):
+   - Full input form featuring [`NeonTextField`](file:///Users/hamzaalsarsour/Untitled/neon_custom_mobile_framework/NeonFramework-2/neon_framework/lib/src/widgets/text_field.dart) for title and description notes.
+   - Priority selection pills and category chip selection.
+   - Form validation and smooth native modal dismissal.
+
+3. **Productivity Analytics Dashboard** (Screen 3):
+   - Metric summary cards: Total Tasks, Completed, Pending, and Efficiency Rate.
+   - Priority distribution overview and quick reset/creation action triggers.
+
+4. **App Settings & Engine Diagnostics** (Screen 4):
+   - **RFC-6902 Widget Tree Diffing Engine**: Live switch toggle allowing developers to observe incremental JSON patching vs. full tree rebuilds in real-time.
+   - **Time-Travel & Diagnostics**: Inspect active navigation stacks, route parameters, and state snapshot manifests.
+   - **Decoupled Architecture**: 100% native UI rendering driven by a headless Dart backend.
+
+### Running the Demo App
+
+```bash
+# Clone the demo app repository
+git clone https://github.com/hamze-ibraheem/neon_to_do_list_app.git
+cd neon_to_do_list_app
+
+# Fetch dependencies and run
+dart pub get
+dart run lib/main.dart
+```
 
 ---
 
@@ -438,6 +543,8 @@ neon_custom_mobile_framework/
 
 ## 🚀 Quick Start Guide
 
+> 📖 **Official Documentation**: Detailed step-by-step guides and API references are available at **[docs.neonframework.dev/docs/quick-start](https://docs.neonframework.dev/docs/quick-start)**. Explore tutorials, showcase projects, and updates on **[neonframework.dev](https://neonframework.dev)**.
+
 ### Prerequisites
 
 - **Dart SDK**: `^3.0.0`
@@ -599,6 +706,24 @@ class _CounterScreenState extends NeonState<CounterScreen> {
 
 ---
 
+## ⚖️ Copyright & Ownership
+
+**Neon Framework** is authored, owned, and copyrighted by **Task Foundation LLC**, founded by **Hamza Ibrahim**.
+
+| Attribute | Details |
+|---|---|
+| **Company** | **Task Foundation LLC** |
+| **Founder** | **Hamza Ibrahim** |
+| **Official Website** | [https://taskfoundation.net](https://taskfoundation.net) |
+| **Company Profile & About** | [https://taskfoundation.net/about-us/](https://taskfoundation.net/about-us/) |
+| **Corporate Address** | 30 N Gould St, Ste R, Sheridan, WY 82801, United States |
+| **Contact Email** | [hamzaalsarsour@taskfoundation.net](mailto:hamzaalsarsour@taskfoundation.net) |
+| **Core Expertise** | Advanced mobile frameworks, cross-platform & native mobile engineering (Android & iOS), scalable SaaS platforms, and enterprise digital solutions. |
+
+---
+
 ## 📄 License
 
-Neon Framework is distributed under the [MIT License](LICENSE).
+Copyright &copy; 2026 **Task Foundation LLC**. Founder: **Hamza Ibrahim**.
+
+Neon Framework is open-source software licensed under the [MIT License](LICENSE).

@@ -2,10 +2,61 @@
 
 > **A standalone, Flutter-free Dart SDK for building true native mobile applications on Android & iOS.**
 
-[![Dart SDK](https://img.shields.io/badge/Dart-3.0+-0175C2?logo=dart&logoColor=white)](https://dart.dev)
-[![Platforms](https://img.shields.io/badge/Platforms-Android%20%7C%20iOS-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
-[![Tests](https://img.shields.io/badge/Tests-403%20Passing-brightgreen?style=flat)]()
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+<p align="center">
+  <img src="assets/neon_hero_banner.jpg" alt="Neon Framework Hero" width="460" />
+</p>
+
+<p align="center">
+  <a href="https://neonframework.dev"><img src="https://img.shields.io/badge/Website-neonframework.dev-6C5CE7?logo=googlechrome&logoColor=white" alt="Website" /></a>
+  <a href="https://docs.neonframework.dev/docs/quick-start"><img src="https://img.shields.io/badge/Docs-Quick%20Start-00CEC9?logo=googledocs&logoColor=white" alt="Docs" /></a>
+  <a href="https://dart.dev"><img src="https://img.shields.io/badge/Dart-3.0+-0175C2?logo=dart&logoColor=white" alt="Dart SDK" /></a>
+  <a href="https://developer.android.com"><img src="https://img.shields.io/badge/Platforms-Android%20%7C%20iOS-3DDC84?logo=android&logoColor=white" alt="Platforms" /></a>
+  <img src="https://img.shields.io/badge/Tests-403%20Passing-brightgreen?style=flat" alt="Tests" />
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License" /></a>
+</p>
+
+<p align="center">
+  🌐 <a href="https://neonframework.dev"><strong>neonframework.dev</strong></a> &nbsp;&bull;&nbsp; 
+  📚 <a href="https://docs.neonframework.dev/docs/quick-start"><strong>Official Documentation & Quick Start</strong></a>
+</p>
+
+---
+
+## Architectural Advantage
+
+<p align="center">
+  <img src="assets/why_neon_outperforms.jpg" alt="Why Neon Outperforms" width="850" />
+</p>
+
+---
+
+## Neon vs. Flutter Comparison
+
+<p align="center">
+  <img src="assets/neon_vs_flutter.jpg" alt="Neon vs Flutter" width="460" />
+</p>
+
+---
+
+## 📱 Featured Demo App: Neon Task Studio
+
+> **GitHub Repository**: [`https://github.com/hamze-ibraheem/neon_to_do_list_app.git`](https://github.com/hamze-ibraheem/neon_to_do_list_app.git)
+
+A full-featured reference to-do and productivity application built with **Neon Framework v0.2.0**:
+
+<p align="center">
+  <img src="assets/demo_task_studio.jpg" width="23%" alt="Task Studio Main Screen" />
+  &nbsp;
+  <img src="assets/demo_create_task.png" width="23%" alt="Create Task Modal" />
+  &nbsp;
+  <img src="assets/demo_analytics.png" width="23%" alt="Productivity Analytics" />
+  &nbsp;
+  <img src="assets/demo_settings_diagnostics.jpg" width="23%" alt="Settings & Diffing Diagnostics" />
+</p>
+
+- **Real-Time Diffing Diagnostics**: Live RFC-6902 tree diffing toggle on the settings screen.
+- **Pure Dart State**: Reactive signals managing tasks, priorities, categories, and metrics.
+- **100% Native Views**: Rendered directly via Kotlin and UIKit shells without Flutter canvas layers.
 
 ---
 
@@ -181,7 +232,22 @@ All 403 tests pass cleanly.
 
 ---
 
+## ⚖️ Copyright & Ownership
+
+**Neon Framework** is authored and owned by **Task Foundation LLC**, founded by **Hamza Ibrahim**.
+
+- **Organization**: Task Foundation LLC
+- **Founder**: Hamza Ibrahim
+- **Website**: [https://taskfoundation.net](https://taskfoundation.net)
+- **About Us**: [https://taskfoundation.net/about-us/](https://taskfoundation.net/about-us/)
+- **Address**: 30 N Gould St, Ste R, Sheridan, WY 82801, United States
+- **Contact**: [hamzaalsarsour@taskfoundation.net](mailto:hamzaalsarsour@taskfoundation.net)
+
+---
+
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
+Copyright &copy; 2026 **Task Foundation LLC**. Founder: **Hamza Ibrahim**.
+
+Distributed under the [MIT License](LICENSE).
 
