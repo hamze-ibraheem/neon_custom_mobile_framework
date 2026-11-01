@@ -14,6 +14,12 @@ abstract class NeonRenderObject {
   bool _needsLayout = true;
   bool _needsPaint = true;
 
+  /// Whether this render object needs layout.
+  bool get needsLayout => _needsLayout;
+
+  /// Whether this render object needs paint.
+  bool get needsPaint => _needsPaint;
+
   /// The size determined during layout.
   NeonSize get size => _size;
 

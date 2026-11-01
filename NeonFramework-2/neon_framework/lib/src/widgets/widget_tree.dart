@@ -656,62 +656,61 @@ class NeonWidgetTree {
       return [widget.child!];
     }
     if (widget is Expanded) {
-      return [(widget as Expanded).child];
+      return [widget.child];
     }
     if (widget is Center) {
-      return [(widget as Center).child];
+      return [widget.child];
     }
-    if (widget is SizedBox && (widget as SizedBox).child != null) {
-      return [(widget as SizedBox).child!];
+    if (widget is SizedBox && widget.child != null) {
+      return [widget.child!];
     }
     if (widget is Positioned) {
-      return [(widget as Positioned).child];
+      return [widget.child];
     }
     if (widget is Card) {
-      return [(widget as Card).child];
+      return [widget.child];
     }
     if (widget is Dialog) {
-      final dlg = widget as Dialog;
       final result = <NeonWidget>[];
-      if (dlg.content != null && dlg.content is! Text) result.add(dlg.content!);
-      if (dlg.actions != null) result.addAll(dlg.actions!);
+      if (widget.content != null && widget.content is! Text) {
+        result.add(widget.content!);
+      }
+      if (widget.actions != null) result.addAll(widget.actions!);
       return result;
     }
     if (widget is BottomSheet) {
-      return [(widget as BottomSheet).child];
+      return [widget.child];
     }
     if (widget is MenuAnchor) {
-      return [(widget as MenuAnchor).child];
+      return [widget.child];
     }
     if (widget is ListTile) {
-      final lt = widget as ListTile;
       final result = <NeonWidget>[];
-      if (lt.leading != null) result.add(lt.leading!);
-      if (lt.title != null) result.add(lt.title!);
-      if (lt.subtitle != null) result.add(lt.subtitle!);
-      if (lt.trailing != null) result.add(lt.trailing!);
+      if (widget.leading != null) result.add(widget.leading!);
+      if (widget.title != null) result.add(widget.title!);
+      if (widget.subtitle != null) result.add(widget.subtitle!);
+      if (widget.trailing != null) result.add(widget.trailing!);
       return result;
     }
     if (widget is Tooltip) {
-      return [(widget as Tooltip).child];
+      return [widget.child];
     }
     if (widget is SnackBar) {
-      final sb = widget as SnackBar;
-      final result = <NeonWidget>[sb.content];
-      if (sb.action != null) result.add(sb.action!);
+      final result = <NeonWidget>[widget.content];
+      if (widget.action != null) result.add(widget.action!);
       return result;
     }
     if (widget is SingleChildScrollView) {
-      return [(widget as SingleChildScrollView).child];
+      return [widget.child];
     }
     if (widget is ListView) {
-      return (widget as ListView).children;
+      return widget.children;
     }
     if (widget is CustomScrollView) {
-      return (widget as CustomScrollView).slivers;
+      return widget.slivers;
     }
     if (widget is SliverList) {
-      return (widget as SliverList).children;
+      return widget.children;
     }
     return [];
   }

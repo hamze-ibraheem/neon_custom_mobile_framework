@@ -1,7 +1,6 @@
 import 'package:neon_framework/src/widgets/widget.dart';
 import 'package:neon_framework/src/widgets/build_context.dart';
 import 'package:neon_framework/src/widgets/primitives.dart';
-import 'package:neon_framework/src/widgets/layout.dart';
 
 enum ScrollDirection { vertical, horizontal }
 

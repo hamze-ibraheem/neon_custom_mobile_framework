@@ -175,7 +175,7 @@ class NeonDeviceInfoPlugin extends NeonNativePlugin {
   }
 
   Future<Map<String, dynamic>?> fetchDeviceInfo() async {
-    final result = await nativeChannel!.invokeMethod<Map<String, dynamic>>('getDeviceInfo');
+    final result = await nativeChannel.invokeMethod<Map<String, dynamic>>('getDeviceInfo');
     if (result != null) {
       _deviceModel = result['model'] as String? ?? _deviceModel;
       _osVersion = result['os_version'] as String? ?? _osVersion;
@@ -186,7 +186,7 @@ class NeonDeviceInfoPlugin extends NeonNativePlugin {
   }
 
   Future<Map<String, dynamic>?> fetchBatteryInfo() async {
-    final result = await nativeChannel!.invokeMethod<Map<String, dynamic>>('getBatteryInfo');
+    final result = await nativeChannel.invokeMethod<Map<String, dynamic>>('getBatteryInfo');
     if (result != null) {
       _batteryLevel = (result['level'] as num?)?.toDouble() ?? _batteryLevel;
       _isCharging = result['charging'] as bool? ?? _isCharging;

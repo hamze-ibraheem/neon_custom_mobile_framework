@@ -189,11 +189,11 @@ class RunCommand extends Command<int> {
   // ----------------------------
   // HOT RELOAD HANDLER
   // ----------------------------
-  void _triggerReload(
+  Future<void> _triggerReload(
     NeonProject project,
     Process appProcess,
     HotReloadEvent event,
-  ) {
+  ) async {
     switch (event.type) {
       case HotReloadEventType.uiReload:
         NeonLogger.step('Re-running build methods...');
@@ -204,7 +204,7 @@ class RunCommand extends Command<int> {
       case HotReloadEventType.fullReload:
         NeonLogger.step('Full reload: restarting app process...');
         appProcess.kill();
-        final newProcess = _launchDartApp(project);
+        final newProcess = await _launchDartApp(project);
         if (newProcess != null) {
           NeonLogger.success('App restarted.');
         }
