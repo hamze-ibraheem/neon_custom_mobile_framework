@@ -43,6 +43,7 @@
   - [9. Extensibility & Plugin Architecture](#9-extensibility--plugin-architecture)
   - [10. Developer CLI & Hot Reload Engine](#10-developer-cli--hot-reload-engine)
   - [11. Flutter-to-Neon AST Transpiler](#11-flutter-to-neon-ast-transpiler)
+  - [12. Subsystem Feature Options & Dynamic Management](#12-subsystem-feature-options--dynamic-management)
 - [Project Directory Structure](#-project-directory-structure)
 - [Quick Start Guide](#-quick-start-guide)
   - [Prerequisites](#prerequisites)
@@ -51,7 +52,7 @@
   - [3. Run iOS Shell](#3-run-on-ios)
   - [4. Web Preview & Inspection](#4-web-preview--inspection)
 - [Testing](#-testing)
-- [Contributing & Best Practices](#-contributing--best-practices)
+- [Contributing & Contributor PR Governance](#-contributing--contributor-pr-governance)
 - [Copyright & Ownership](#-copyright--ownership)
 - [License](#-license)
 
@@ -479,6 +480,39 @@ dart run tools/transpiler/main.dart flutter_input/ lib/neon_compat/
 
 ---
 
+### 12. Subsystem Feature Options & Dynamic Management
+
+Located in [`neon_framework/lib/src/core/feature_options.dart`](file:///Users/hamzaalsarsour/Untitled/neon_custom_mobile_framework/NeonFramework-2/neon_framework/lib/src/core/feature_options.dart):
+
+On branch `dev-beta-version-1.0.0`, Neon introduces **`NeonFeatureOptions`** — a modular, typed feature configuration and observation system allowing developers to customize runtime subsystem behaviors statically or toggle them at runtime via reactive signals without server reboots:
+
+- **`DiffingOptions`**: Toggle tree diffing (`enabled`), configure max patch batch sizes (`maxPatchBatchSize`), recovery fallback (`enableRecoveryFallback`), and native focus preservation (`preserveNativeFocus`).
+- **`NavigationOptions`**: Control in-memory telemetry recording (`enableTelemetry`), synthetic backstack generation on deep links (`enableSyntheticBackstack`), strict path compliance, and redirect recursion depth.
+- **`RenderingOptions`**: Toggle spring physics animations, constraint assertions, and ASCII frame rendering logs.
+- **`DataOptions`**: Adjust HTTP network timeouts, automatic WebSocket re-connections, and cache TTL policies.
+- **`DiagnosticsOptions`**: Enable live web inspectors, time-travel snapshots, and action dispatch logging.
+
+```dart
+// Static configuration via NeonConfig
+final appConfig = NeonConfig(
+  featureOptions: NeonFeatureOptions(
+    diffing: const DiffingOptions(enabled: true, maxPatchBatchSize: 100),
+    diagnostics: const DiagnosticsOptions(verboseActionLogging: false),
+  ),
+);
+
+// Dynamic runtime modification (via NeonApp.instance.featureOptionsManager)
+NeonApp.instance.featureOptionsManager.mutate((options) {
+  return options.copyWith(
+    diffing: options.diffing.copyWith(enabled: false), // Temporarily switch to full-tree responses
+  );
+});
+```
+
+Neon also exposes HTTP endpoints (`GET /api/feature-options` and `POST /api/feature-options`) so native mobile shells and client debuggers can query and update subsystem feature options on the fly.
+
+---
+
 ## 📁 Project Directory Structure
 
 ```
@@ -697,12 +731,22 @@ class _CounterScreenState extends NeonState<CounterScreen> {
 
 ---
 
-## 🤝 Contributing & Best Practices
+## 🤝 Contributing & Contributor PR Governance
 
+Neon Framework enforces a structured contributor review model on `dev-beta-version-1.0.0` and `main`:
+
+### 🔒 Feature & Enhancement Pull Requests
+- **Authorized Contributors Only**: Pull requests proposing new **features** or **enhancements** are restricted to authorized contributors and team maintainers to protect engine stability.
+- **RFC & Issue Process**: External contributors should first open a Feature Proposal Issue or RFC. Once approved by maintainers, the PR will receive the `contributor-approved` label to unlock automated CI testing and review.
+- **Bug Fixes & Docs**: Bug fixes and documentation improvements are welcome from all community members without pre-approval.
+- **Contributor Guidelines**: See [`CONTRIBUTING.md`](file:///Users/hamzaalsarsour/Untitled/neon_custom_mobile_framework/CONTRIBUTING.md) and [`CODEOWNERS`](file:///Users/hamzaalsarsour/Untitled/neon_custom_mobile_framework/.github/CODEOWNERS) for details.
+
+### 📐 Best Practices for Code Changes
 1. **Keys on Interactive Widgets**: Always assign stable `key` identifiers (e.g. `key: 'btn_submit'`) to interactive components so the native shell can route action events accurately.
 2. **Double Invariants**: When setting container dimensions, use standard finite numbers. Do not serialize raw `double.infinity` into JSON nodes.
 3. **Async State Scheduling**: `setState()` operations run on the microtask queue; action handlers automatically await microtask synchronization before serializing updates.
 4. **No Flutter Imports**: The framework is 100% standalone. Keep `package:flutter` dependencies out of framework source files.
+5. **Feature Options**: Expose configurable subsystem flags through `NeonFeatureOptions`.
 
 ---
 

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'environment.dart';
 import 'error_handler.dart';
 import 'lifecycle.dart';
+import 'feature_options.dart';
 import 'package:neon_framework/src/widgets/widget.dart';
 import 'package:neon_framework/src/widgets/build_context.dart';
 import 'package:neon_framework/src/widgets/widget_tree.dart';
@@ -48,10 +49,14 @@ class NeonApp {
   late final NeonErrorHandler _errorHandler;
   late final NeonWidgetTree _widgetTree;
   late final NeonBuildContext _rootContext;
+  late final NeonFeatureOptionsManager _featureOptionsManager;
   bool _isRunning = false;
   HttpServer? _server;
   int _currentRevision = 1;
   Map<String, dynamic>? _lastTreeSnapshot;
+
+  /// The feature options manager for runtime feature toggling.
+  NeonFeatureOptionsManager get featureOptionsManager => _featureOptionsManager;
 
   /// The widget tree managed by this application.
   NeonWidgetTree get widgetTree => _widgetTree;
@@ -73,6 +78,7 @@ class NeonApp {
     _errorHandler = NeonErrorHandler(environment: config.environment);
     _widgetTree = NeonWidgetTree();
     _rootContext = NeonBuildContext(config: config);
+    _featureOptionsManager = NeonFeatureOptionsManager(config.featureOptions);
   }
 
   static void run(
@@ -316,7 +322,9 @@ class NeonApp {
 
         final newJsonTree = _widgetTree.root?.toJson() ?? {};
         final bool diffingEnabled =
-            config.enableDiffing && !config.featureFlags.isEnabled('disable_diffing');
+            _featureOptionsManager.current.diffing.enabled &&
+            config.enableDiffing &&
+            !config.featureFlags.isEnabled('disable_diffing');
 
         final dynamic rawClientRev = params['clientRevision'] ??
             request.headers.value('X-Neon-Client-Revision');
@@ -418,6 +426,29 @@ class NeonApp {
           ..write(jsonEncode(remoteTree.root?.toJson() ?? {}))
           ..close();
         return;
+      }
+
+      // ✅ FEATURE OPTIONS API: Get or update subsystem options at runtime
+      if (request.uri.path == '/api/feature-options') {
+        if (request.method == 'GET') {
+          request.response
+            ..headers.contentType = ContentType.json
+            ..write(jsonEncode(_featureOptionsManager.current.toJson()))
+            ..close();
+          return;
+        } else if (request.method == 'POST') {
+          final content = await utf8.decoder.bind(request).join();
+          final json = jsonDecode(content) as Map<String, dynamic>;
+          _featureOptionsManager.updateFromJson(json);
+          request.response
+            ..headers.contentType = ContentType.json
+            ..write(jsonEncode({
+              'success': true,
+              'options': _featureOptionsManager.current.toJson(),
+            }))
+            ..close();
+          return;
+        }
       }
 
       // ✅ JSON API: Send the Tree as JSON

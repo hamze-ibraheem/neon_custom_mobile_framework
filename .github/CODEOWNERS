@@ -1,0 +1,23 @@
+# Global repository ownership for Neon Framework
+# Managed by Task Foundation LLC
+
+*                   @hamze-ibraheem
+
+# Core runtime, architecture, and feature options
+/NeonFramework-2/neon_framework/lib/src/core/       @hamze-ibraheem
+/NeonFramework-2/neon_framework/lib/src/widgets/    @hamze-ibraheem
+/NeonFramework-2/neon_framework/lib/src/navigation/ @hamze-ibraheem
+/NeonFramework-2/neon_framework/lib/src/platform/   @hamze-ibraheem
+/NeonFramework-2/neon_framework/lib/src/rendering/  @hamze-ibraheem
+/NeonFramework-2/neon_framework/lib/src/state/      @hamze-ibraheem
+/NeonFramework-2/neon_framework/lib/src/data/       @hamze-ibraheem
+/NeonFramework-2/neon_framework/lib/src/plugins/    @hamze-ibraheem
+
+# Native shells
+/NeonFramework-2/neon_framework/my_2nd_test_app/android/  @hamze-ibraheem
+/NeonFramework-2/neon_framework/my_2nd_test_app/NeonApp/  @hamze-ibraheem
+
+# Tooling, AST transpiler, and CI workflows
+/tools/transpiler/                                  @hamze-ibraheem
+/.github/                                           @hamze-ibraheem
+

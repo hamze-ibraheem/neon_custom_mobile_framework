@@ -1,3 +1,5 @@
+import 'feature_options.dart';
+
 /// Represents the deployment environment for the Neon application.
 enum NeonEnvironment {
   development,
@@ -61,6 +63,9 @@ class NeonConfig {
   /// Feature flags for this configuration.
   final NeonFeatureFlags featureFlags;
 
+  /// Subsystem feature options for Neon Framework v1.0.0.
+  final NeonFeatureOptions featureOptions;
+
   /// The port for the UI server.
   final int port;
 
@@ -75,6 +80,7 @@ class NeonConfig {
     this.environment = NeonEnvironment.development,
     this.buildFlavor,
     this.featureFlags = const NeonFeatureFlags(),
+    this.featureOptions = const NeonFeatureOptions(),
     this.port = 8080,
     this.enableDiffing = true,
     this.custom = const {},
@@ -94,6 +100,7 @@ class NeonConfig {
     NeonEnvironment? environment,
     NeonBuildFlavor? buildFlavor,
     NeonFeatureFlags? featureFlags,
+    NeonFeatureOptions? featureOptions,
     int? port,
     bool? enableDiffing,
     Map<String, dynamic>? custom,
@@ -102,6 +109,7 @@ class NeonConfig {
       environment: environment ?? this.environment,
       buildFlavor: buildFlavor ?? this.buildFlavor,
       featureFlags: featureFlags ?? this.featureFlags,
+      featureOptions: featureOptions ?? this.featureOptions,
       port: port ?? this.port,
       enableDiffing: enableDiffing ?? this.enableDiffing,
       custom: custom ?? this.custom,
@@ -110,5 +118,5 @@ class NeonConfig {
 
   @override
   String toString() =>
-      'NeonConfig(env: $environment, flavor: $buildFlavor, flags: $featureFlags, diffing: $enableDiffing)';
+      'NeonConfig(env: $environment, flavor: $buildFlavor, flags: $featureFlags, options: $featureOptions, diffing: $enableDiffing)';
 }

@@ -1,0 +1,96 @@
+name: Contributor PR Guard & CI Validation
+
+on:
+  pull_request:
+    branches:
+      - dev-beta-version-1.0.0
+      - main
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled]
+
+jobs:
+  contributor-check:
+    name: Contributor Authorization Guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Contributor Status for Features & Enhancements
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            const author = pr.user.login;
+            const authorAssociation = pr.author_association;
+            const title = pr.title.toLowerCase();
+            const body = (pr.body || '').toLowerCase();
+            const labels = pr.labels.map(l => l.name.toLowerCase());
+
+            const isFeatureOrEnhancement = 
+              title.startsWith('feat') ||
+              title.includes('feature') ||
+              title.includes('enhancement') ||
+              labels.includes('feature') ||
+              labels.includes('enhancement') ||
+              body.includes('[x] 🚀 new feature') ||
+              body.includes('[x] ⚡ enhancement');
+
+            core.info(`Author: ${author} (Association: ${authorAssociation})`);
+            core.info(`Is Feature/Enhancement PR: ${isFeatureOrEnhancement}`);
+
+            const authorizedAssociations = ['OWNER', 'MEMBER', 'COLLABORATOR'];
+            const hasContributorApproval = labels.includes('contributor-approved');
+            const isAuthorized = authorizedAssociations.includes(authorAssociation) || hasContributorApproval;
+
+            if (isFeatureOrEnhancement && !isAuthorized) {
+              const warningMessage = `### ⛔ Feature PR Restricted to Authorized Contributors\n\n` +
+                `Hello @${author}! Thank you for your interest in **Neon Framework**.\n\n` +
+                `On branch \`${pr.base.ref}\`, pull requests that introduce new **features** or **enhancements** are restricted to authorized contributors and team maintainers.\n\n` +
+                `**Next Steps:**\n` +
+                `1. Please open an [Issue / RFC](https://github.com/${context.repo.owner}/${context.repo.repo}/issues) outlining your proposed feature first.\n` +
+                `2. Once approved by maintainers, a maintainer will label this PR with \`contributor-approved\` to unlock the review pipeline.\n\n` +
+                `*Bug fixes and documentation updates are always welcome and do not require prior contributor approval.*`;
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: warningMessage
+              });
+
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels: ['needs-contributor-triage']
+              });
+
+              core.setFailed(`Feature/Enhancement PR opened by non-contributor @${author}. Awaiting RFC/Issue sign-off.`);
+            } else {
+              core.info(`✅ Contributor authorization verified for @${author}.`);
+            }
+
+  test-and-analyze:
+    name: Neon Framework Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install Dependencies
+        run: |
+          cd NeonFramework-2/neon_framework
+          dart pub get
+
+      - name: Analyze Code
+        run: |
+          cd NeonFramework-2/neon_framework
+          dart analyze --fatal-warnings
+
+      - name: Run Unit and Integration Tests
+        run: |
+          cd NeonFramework-2/neon_framework
+          dart test
