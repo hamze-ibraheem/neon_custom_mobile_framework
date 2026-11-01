@@ -126,4 +126,15 @@ Build/
 **/android/app/build/
 **/android/local.properties
 
+# Secrets, keys and certs
+*.key
+*.pem
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+google-services.json
+GoogleService-Info.plist
+
+
 
