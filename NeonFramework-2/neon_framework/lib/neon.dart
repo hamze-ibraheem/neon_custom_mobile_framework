@@ -5,6 +5,7 @@ export 'src/core/neon_app.dart';
 export 'src/core/lifecycle.dart';
 export 'src/core/error_handler.dart';
 export 'src/core/environment.dart';
+export 'src/core/feature_options.dart';
 
 export 'src/widgets/widget.dart';
 export 'src/widgets/build_context.dart';

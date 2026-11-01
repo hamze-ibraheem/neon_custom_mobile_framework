@@ -211,6 +211,35 @@ final router = NeonRouter(
 
 ---
 
+## Subsystem Feature Options
+
+Neon Framework provides typed feature options (`NeonFeatureOptions`) for fine-grained runtime control:
+
+```dart
+final config = NeonConfig(
+  featureOptions: NeonFeatureOptions(
+    diffing: const DiffingOptions(enabled: true, maxPatchBatchSize: 150),
+    navigation: const NavigationOptions(enableTelemetry: true),
+    diagnostics: const DiagnosticsOptions(verboseActionLogging: true),
+  ),
+);
+
+// Toggle at runtime without rebooting the server:
+NeonApp.instance.featureOptionsManager.mutate((opts) {
+  return opts.copyWith(
+    diffing: opts.diffing.copyWith(enabled: false),
+  );
+});
+```
+
+---
+
+## Contributor PR Governance
+
+Pull requests introducing new **features** or **enhancements** on `dev-beta-version-1.0.0` or `main` are restricted to authorized contributors. Community feature ideas should be proposed via an Issue/RFC first. See [`CONTRIBUTING.md`](../../CONTRIBUTING.md) for full instructions.
+
+---
+
 ## Native Platform Integration
 
 1. Start your Dart application with `dart run lib/main.dart`.
