@@ -437,7 +437,7 @@ void main() {
 
   group('NeonColor', () {
     test('equality', () {
-      expect(NeonColor.blue, equals(const NeonColor(0xFF0000FF)));
+      expect(NeonColor.blue, equals(const NeonColor(0xFF4F46E5)));
       expect(NeonColor.red, isNot(equals(NeonColor.blue)));
     });
 
