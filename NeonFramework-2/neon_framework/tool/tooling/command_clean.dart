@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'cli.dart';
-import 'neon_project.dart';
 
 class CleanCommand extends Command<int> {
   @override

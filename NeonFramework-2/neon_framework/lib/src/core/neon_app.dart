@@ -8,7 +8,6 @@ import 'feature_options.dart';
 import 'package:neon_framework/src/widgets/widget.dart';
 import 'package:neon_framework/src/widgets/build_context.dart';
 import 'package:neon_framework/src/widgets/widget_tree.dart';
-import 'package:neon_framework/src/widgets/badge.dart';
 import 'package:neon_framework/src/widgets/chip.dart';
 import 'package:neon_framework/src/widgets/selection_controls.dart';
 import 'package:neon_framework/src/widgets/slider.dart';
@@ -25,10 +24,7 @@ import 'package:neon_framework/src/widgets/search_bar.dart';
 import 'package:neon_framework/src/widgets/text_field.dart';
 import 'package:neon_framework/src/widgets/menu.dart';
 import 'package:neon_framework/src/widgets/list_tile.dart';
-import 'package:neon_framework/src/widgets/progress_indicator.dart';
-import 'package:neon_framework/src/widgets/tooltip.dart';
 import 'package:neon_framework/src/widgets/snack_bar.dart';
-import 'package:neon_framework/src/widgets/scroll_view.dart';
 import 'package:neon_framework/src/widgets/tree_diff.dart';
 
 class NeonApp {

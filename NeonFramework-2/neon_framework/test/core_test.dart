@@ -1750,6 +1750,7 @@ void main() {
       );
 
       expect(engine.onReload, isNotNull);
+      expect(captured, isNull);
     });
   });
 
@@ -1891,8 +1892,6 @@ void main() {
     });
 
     test('prefix isolates keys', () async {
-      final kv1 = NeonKeyValueStore(prefix: 'app');
-      final kv2 = NeonKeyValueStore(prefix: 'cache');
       final backend = NeonMemoryKVBackend();
       final kvA = NeonKeyValueStore(backend: backend, prefix: 'a');
       final kvB = NeonKeyValueStore(backend: backend, prefix: 'b');
@@ -3140,7 +3139,7 @@ void main() {
 
       expect(deviceInfo.isRegistered, isTrue);
       expect(deviceInfo.nativeChannel, isNotNull);
-      expect(deviceInfo.nativeChannel!.name,
+      expect(deviceInfo.nativeChannel.name,
           equals('neon/plugin/neon_device_info'));
     });
 
@@ -3148,7 +3147,7 @@ void main() {
       final deviceInfo = NeonDeviceInfoPlugin();
       registry.register(deviceInfo);
 
-      await deviceInfo.nativeChannel!.handlePlatformMessage(
+      await deviceInfo.nativeChannel.handlePlatformMessage(
         'updateDeviceInfo',
         {
           'model': 'Pixel 8',
@@ -3166,7 +3165,7 @@ void main() {
       final deviceInfo = NeonDeviceInfoPlugin();
       registry.register(deviceInfo);
 
-      await deviceInfo.nativeChannel!.handlePlatformMessage(
+      await deviceInfo.nativeChannel.handlePlatformMessage(
         'updateBattery',
         {'level': 0.85, 'charging': true},
       );
@@ -3196,7 +3195,7 @@ void main() {
       final deviceInfo = NeonDeviceInfoPlugin();
       registry.register(deviceInfo);
 
-      final channel = deviceInfo.nativeChannel!;
+      final channel = deviceInfo.nativeChannel;
       registry.unregister('neon_device_info');
 
       expect(channel.isOpen, isFalse);
@@ -3664,6 +3663,7 @@ void main() {
         channel: NeonPlatformChannel(name: 'test/fs'),
       );
 
+      expect(fs.channel.name, equals('test/fs'));
       expect(NeonStorageLocation.appDocuments, isNotNull);
       expect(NeonStorageLocation.appCache, isNotNull);
       expect(NeonStorageLocation.appSupport, isNotNull);
@@ -3827,7 +3827,7 @@ class _CapabilityPluginB extends NeonDartPlugin {
 }
 
 class _BenchmarkApp extends StatelessWidget {
-  const _BenchmarkApp({super.key});
+  const _BenchmarkApp();
 
   @override
   NeonWidget build(NeonBuildContext context) {

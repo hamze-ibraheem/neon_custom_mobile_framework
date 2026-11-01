@@ -85,7 +85,13 @@ class _HomeScreenState extends NeonState<HomeScreen> {
       Container(height: 20, child: Text('')),
 
       Text('Counter: $_counter'),
-      Button(onPressed: _increment, child: Text('Increment')),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Button(onPressed: _decrement, child: Text('Decrement')),
+          Button(onPressed: _increment, child: Text('Increment')),
+        ],
+      ),
     ]);
   }
 }

@@ -40,8 +40,8 @@ void main() {
       final context = NeonBuildContext(config: const NeonConfig());
       final built = chip.build(context) as LeafWidget;
       expect(built.type, equals('ActionChip'));
-      // In a real scenario, the host would trigger this.
-      // For now we just verify it exists.
+      chip.onPressed?.call();
+      expect(pressed, isTrue);
     });
 
     test('FilterChip selection', () {
@@ -54,6 +54,8 @@ void main() {
       final context = NeonBuildContext(config: const NeonConfig());
       final built = chip.build(context) as LeafWidget;
       expect(built.type, equals('FilterChip'));
+      chip.onSelected?.call(true);
+      expect(selectedValue, isTrue);
     });
 
     test('ChoiceChip', () {
@@ -75,6 +77,8 @@ void main() {
       final context = NeonBuildContext(config: const NeonConfig());
       final built = chip.build(context) as LeafWidget;
       expect(built.type, equals('InputChip'));
+      chip.onDeleted?.call();
+      expect(deleted, isTrue);
     });
   });
 

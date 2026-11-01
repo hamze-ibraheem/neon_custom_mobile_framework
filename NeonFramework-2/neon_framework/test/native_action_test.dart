@@ -55,6 +55,7 @@ void main() {
     var response = await request.close();
     var body = await response.transform(utf8.decoder).join();
     var json = jsonDecode(body);
+    expect(json, isNotNull);
 
     // Initial count should be 0
     // The ID for the button will be 'btn_increment' (since I fixed the .u issue)

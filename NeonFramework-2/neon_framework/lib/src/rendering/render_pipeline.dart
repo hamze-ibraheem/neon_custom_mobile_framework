@@ -2,10 +2,8 @@ import 'package:neon_framework/src/rendering/render_object.dart';
 import 'package:neon_framework/src/rendering/constraints.dart';
 import 'package:neon_framework/src/rendering/canvas.dart';
 import 'package:neon_framework/src/rendering/render_widgets.dart';
-import 'package:neon_framework/src/widgets/widget.dart';
 import 'package:neon_framework/src/widgets/text.dart' as w;
 import 'package:neon_framework/src/widgets/container.dart' as w;
-import 'package:neon_framework/src/widgets/button.dart' as w;
 import 'package:neon_framework/src/widgets/layout.dart' as w;
 import 'package:neon_framework/src/widgets/widget_tree.dart';
 

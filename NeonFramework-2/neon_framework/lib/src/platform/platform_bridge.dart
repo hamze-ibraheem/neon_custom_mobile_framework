@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:neon_framework/src/platform/platform_channel.dart';
 import 'package:neon_framework/src/platform/platform_info.dart';
 import 'package:neon_framework/src/platform/native_renderer.dart';
