@@ -468,6 +468,27 @@ class NeonApp {
         return;
       }
 
+      // ✅ NEON STUDIO IDE ROUTE (/studio or /ide)
+      if (request.method == 'GET' &&
+          (request.uri.path == '/studio' ||
+              request.uri.path == '/studio/' ||
+              request.uri.path == '/ide')) {
+        for (final candidate in const <String>[
+          'neon_studio/web/index.html',
+          '../neon_studio/web/index.html',
+          'NeonFramework-2/neon_framework/neon_studio/web/index.html',
+        ]) {
+          final studioFile = File(candidate);
+          if (studioFile.existsSync()) {
+            request.response
+              ..headers.contentType = ContentType.html
+              ..write(studioFile.readAsStringSync())
+              ..close();
+            return;
+          }
+        }
+      }
+
       // ✅ DEFAULT: Serve HTML Web Renderer
       if (request.method == 'GET' &&
           (request.uri.path == '/' || request.uri.path == '')) {

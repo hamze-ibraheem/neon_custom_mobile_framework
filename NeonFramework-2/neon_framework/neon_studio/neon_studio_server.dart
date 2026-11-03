@@ -1,8 +1,8 @@
-/// Live HTTP Backend Server for **Neon Studio IDE** (`http://localhost:9090`).
+/// Production & Local HTTP Backend Server for **Neon Studio IDE**.
 ///
-/// Serves the interactive Neon Studio IDE Workbench UI and exposes live API endpoints
-/// for `.neon` compilation, 3D widget layer inspection, Route Storyboard extraction,
-/// Cross-OS `.apk`/`.bundle`/`.app`/`.ipa` building, and Google Antigravity Agents.
+/// Binds to `0.0.0.0` (`InternetAddress.anyIPv4`) and respects `PORT` environment
+/// variables so it runs seamlessly inside Docker / Easypanel / Hostinger containers
+/// as well as local development (`http://localhost:9090`).
 library neon_studio_server;
 
 import 'dart:convert';
@@ -10,15 +10,18 @@ import 'dart:io';
 import 'package:neon_framework/neon.dart';
 
 Future<void> main(List<String> args) async {
-  final port = args.isNotEmpty ? (int.tryParse(args.first) ?? 9090) : 9090;
+  final envPort = int.tryParse(Platform.environment['PORT'] ?? '');
+  final argPort = args.isNotEmpty ? int.tryParse(args.first) : null;
+  final port = argPort ?? envPort ?? 9090;
+
   final ide = NeonStudioIdeWorkbench();
 
-  final server = await HttpServer.bind(InternetAddress.loopbackIPv4, port);
+  // Bind to 0.0.0.0 (anyIPv4) so Docker / Easypanel / Hostinger reverse proxies can reach it
+  final server = await HttpServer.bind(InternetAddress.anyIPv4, port);
   stdout.writeln('╔══════════════════════════════════════════════════════════════════╗');
-  stdout.writeln('║  ⚡ NEON STUDIO IDE — LIVE WORKBENCH SERVER                      ║');
-  stdout.writeln('║  URL: http://localhost:$port                                      ║');
-  stdout.writeln('║  Features: NeonLang (.neon) + Dart (.dart) | Cross-OS Builder    ║');
-  stdout.writeln('║            Xcode Live Canvas + Android 3D Inspector + Antigravity║');
+  stdout.writeln('║  ⚡ NEON STUDIO IDE — PRODUCTION & CLOUD WORKBENCH SERVER        ║');
+  stdout.writeln('║  Listening on: http://0.0.0.0:$port (Easypanel / Docker Ready)    ║');
+  stdout.writeln('║  Routes: / , /studio , /ide , /api/compile , /api/build          ║');
   stdout.writeln('╚══════════════════════════════════════════════════════════════════╝');
 
   await for (final HttpRequest request in server) {
@@ -33,14 +36,27 @@ Future<void> main(List<String> args) async {
     }
 
     final path = request.uri.path;
-    if (request.method == 'GET' && (path == '/' || path == '/index.html')) {
-      final htmlFile = File('neon_studio/web/index.html');
-      if (htmlFile.existsSync()) {
+    if (request.method == 'GET' &&
+        (path == '/' || path == '/studio' || path == '/studio/' || path == '/ide' || path == '/index.html')) {
+      final htmlFile = _resolveStudioHtmlFile();
+      if (htmlFile != null) {
         request.response.headers.contentType = ContentType.html;
         request.response.write(htmlFile.readAsStringSync());
       } else {
-        request.response.write('Neon Studio IDE UI not found at neon_studio/web/index.html');
+        request.response.statusCode = HttpStatus.notFound;
+        request.response.write('Neon Studio IDE UI not found.');
       }
+      await request.response.close();
+      continue;
+    }
+
+    if (request.method == 'GET' && path == '/health') {
+      request.response.headers.contentType = ContentType.json;
+      request.response.write(jsonEncode(<String, dynamic>{
+        'status': 'healthy',
+        'service': 'neon-studio-ide',
+        'port': port,
+      }));
       await request.response.close();
       continue;
     }
@@ -133,4 +149,17 @@ Future<void> main(List<String> args) async {
     request.response.statusCode = HttpStatus.notFound;
     await request.response.close();
   }
+}
+
+File? _resolveStudioHtmlFile() {
+  const candidates = <String>[
+    'neon_studio/web/index.html',
+    'NeonFramework-2/neon_framework/neon_studio/web/index.html',
+    '../neon_studio/web/index.html',
+  ];
+  for (final path in candidates) {
+    final f = File(path);
+    if (f.existsSync()) return f;
+  }
+  return null;
 }
