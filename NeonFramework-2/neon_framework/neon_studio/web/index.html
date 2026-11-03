@@ -16,11 +16,11 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Inter", monospace; }
     body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-    header { height: 54px; background: #0f172a; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
-    .brand { font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 10px; }
-    .badge { background: rgba(99,102,241,0.2); color: #818cf8; padding: 3px 8px; border-radius: 6px; font-size: 11px; }
-    .toolbar { display: flex; gap: 8px; align-items: center; }
-    button, select { background: #1e293b; color: var(--text); border: 1px solid #334155; padding: 7px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.15s; }
+    header { height: 54px; background: #0f172a; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; white-space: nowrap; gap: 12px; }
+    .brand { font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 10px; white-space: nowrap; flex-shrink: 0; }
+    .badge { background: rgba(99,102,241,0.2); color: #818cf8; padding: 3px 8px; border-radius: 6px; font-size: 11px; white-space: nowrap; }
+    .toolbar { display: flex; gap: 8px; align-items: center; white-space: nowrap; flex-shrink: 0; }
+    button, select { background: #1e293b; color: var(--text); border: 1px solid #334155; padding: 7px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.15s; white-space: nowrap; }
     button:hover { background: #334155; }
     button.primary { background: var(--accent); border-color: var(--accent); font-weight: 600; }
     button.emerald { background: #059669; border-color: #10b981; font-weight: 600; }

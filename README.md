@@ -731,6 +731,99 @@ class _CounterScreenState extends NeonState<CounterScreen> {
 
 ---
 
+## ⚡ NeonLang (`.neon`), Neon Studio IDE & Google Antigravity Agents
+
+Neon Framework includes its own declarative programming language (**`NeonLang` / `.neon`**), a full-featured hybrid workbench (**`Neon Studio IDE`** combining the best of **Apple Xcode** and **Android Studio**), a **Universal Cross-OS Mobile Packager**, and embedded **Google Antigravity SDK Multi-Agent** orchestration.
+
+### 1. `NeonLang` (`.neon`) — 100% Coexistent & Interoperable with Dart (`.dart`)
+
+Write declarative UI with **50%+ less code** while keeping **100% two-way interoperability** with your existing `.dart` services, models, and widgets:
+
+```rust
+// examples/task_studio.neon
+module app.screens.task_studio
+
+import "package:neon_framework/neon.dart"
+
+@state activeCount: Int = 3
+@state tasks: List<String> = ["Design NeonLang", "Build Cross-OS IPA & APK", "Antigravity Agents"]
+
+component TaskStudioScreen {
+    route: "/tasks"
+
+    view {
+        Scaffold(title: "Neon Task Studio") {
+            Column(padding: 16.dp, gap: 12.dp) {
+                Text("Organize with Clarity & Momentum")
+                    .font(size: 20, weight: .bold)
+                    .color(#4F46E5)
+
+                ForEach(tasks) -> item {
+                    Card(elevation: 2) {
+                        Row(align: .spaceBetween) {
+                            Text(item)
+                            Badge("Active")
+                        }
+                    }
+                }
+
+                Button("+ Add Quick Task") {
+                    activeCount += 1
+                }
+                .padding(8.dp)
+            }
+        }
+    }
+}
+```
+
+Compile `.neon` files to optimized Neon Dart (`.dart`) with 1:1 Source Maps via CLI:
+```bash
+cd NeonFramework-2/neon_framework
+dart run bin/neon.dart compile examples/task_studio.neon --watch
+```
+
+### 2. Universal Cross-OS Mobile Packaging (`Windows`, `Apple macOS`, & `Linux Ubuntu`)
+
+Build and sign both **Android (`.apk`, `.aab` / `.bundle`)** and **iOS (`.app`, `.ipa`)** packages directly from **Windows 10/11**, **Apple macOS**, or **Linux Ubuntu**:
+
+```bash
+cd NeonFramework-2/neon_framework
+
+# Build signed Android APK & Google Play App Bundle (.aab / .bundle)
+dart run bin/neon.dart build -t apk
+dart run bin/neon.dart build -t bundle
+
+# Build signed iOS .app Bundle & .ipa Archive (Works on Windows, Linux Ubuntu, & macOS!)
+dart run bin/neon.dart build -t app
+dart run bin/neon.dart build -t ipa
+```
+
+### 3. `Neon Studio IDE` Workbench (`http://localhost:9090`)
+
+Launch the interactive **Neon Studio IDE** combining **Apple Xcode** + **Android Studio** + **Neon Exclusive Tools**:
+- **From Apple Xcode:** Split-pane **Dual-OS Live Interactive Canvas** (simultaneous iOS 18 UIKit + Android 15 Kotlin preview), **Visual Route Storyboard Graph**, and **Unified Signing & Capabilities** (`Info.plist` + `AndroidManifest.xml`).
+- **From Android Studio:** **3D Exploded Widget Layer Hierarchy Inspector** and **RFC-6902 Delta Patch Profiler**.
+- **Neon Exclusives:** **Interactive Time-Travel State Scrubber**, **1-Click Cross-OS `.apk`/`.bundle`/`.app`/`.ipa` Builder**, and **Embedded Google Antigravity Agents**.
+
+```bash
+cd NeonFramework-2/neon_framework
+dart run bin/neon.dart studio
+# Opens http://localhost:9090
+```
+
+### 4. `neon-lsp`, `neon-mcp-server` & Google Antigravity SDK Multi-Agent Suite
+
+- **Language Server (`neon-lsp`):** Real-time AST diagnostics, hover docs, go-to-definition, and autocomplete (`tool/lsp/neon_lsp_main.dart` & `syntaxes/neon.tmLanguage.json`).
+- **Model Context Protocol Server (`neon-mcp-server`):** Exposes `neon_compile_file`, `neon_build_package`, `neon_update_feature_options`, and `neon_transpile_flutter_to_neon` (`tool/mcp/neon_mcp_main.dart`).
+- **Google Antigravity SDK Orchestrator (`neon_studio/agents/antigravity_orchestrator.py`):** Supports **Hosted Gemini Models (`LocalAgentConfig`)**, **100% Offline On-Device Gemma 4 26B (`LiteRTAgentConfig`)**, and **Local Ollama/LM Studio (`LocalOpenAIAgentConfig`)** with 4 specialist subagents:
+  - `neon_ui_architect`
+  - `neon_bridge_doctor`
+  - `neon_flutter_migrator`
+  - `neon_release_packager`
+
+---
+
 ## 🤝 Contributing & Contributor PR Governance
 
 Neon Framework enforces a structured contributor review model on `dev-beta-version-1.0.0` and `main`:

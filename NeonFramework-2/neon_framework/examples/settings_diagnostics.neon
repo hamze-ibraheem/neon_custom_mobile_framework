@@ -1,0 +1,29 @@
+// App Settings & Diagnostics Screen — Declarative NeonLang (.neon)
+module app.screens.settings
+
+import "package:neon_framework/neon.dart"
+
+@state rfc6902Active: Bool = true
+@state snapshotsExported: Int = 0
+
+component SettingsDiagnosticsScreen {
+    route: "/settings"
+
+    view {
+        Scaffold(title: "App Settings & Diagnostics") {
+            Column(padding: 16.dp, gap: 12.dp) {
+                Card(elevation: 2) {
+                    Row(align: .spaceBetween) {
+                        Text("Widget Tree Diffing")
+                            .font(size: 18, weight: .bold)
+                        Badge("RFC-6902 Active")
+                    }
+                }
+                Button("Export Snapshot") {
+                    snapshotsExported += 1
+                }
+            }
+        }
+    }
+}
+

@@ -1,0 +1,30 @@
+// Create New Task Screen — Declarative NeonLang (.neon)
+module app.screens.create_task
+
+import "package:neon_framework/neon.dart"
+
+@state priority: String = "Medium"
+@state category: String = "Work"
+
+component CreateTaskScreen {
+    route: "/create-task"
+
+    view {
+        Scaffold(title: "Create New Task") {
+            Column(padding: 16.dp, gap: 14.dp) {
+                Card(elevation: 1) {
+                    Column(padding: 12.dp, gap: 8.dp) {
+                        Text("Task Title")
+                            .font(size: 16, weight: .bold)
+                        TextField()
+                    }
+                }
+                Button("+ Create Task") {
+                    priority = "High"
+                }
+                .padding(8.dp)
+            }
+        }
+    }
+}
+
