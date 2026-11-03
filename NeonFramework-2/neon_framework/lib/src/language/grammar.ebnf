@@ -1,0 +1,58 @@
+(* ============================================================================
+   NeonLang (.neon) Formal Grammar Specification (EBNF)
+   Target: Neon Framework Dart VM / Native AOT Bridge
+   ============================================================================ *)
+
+program         = [ module_decl ] , { import_decl } , { top_level_decl } ;
+
+module_decl     = "module" , qualified_id ;
+import_decl     = "import" , ( string_literal | qualified_id ) ;
+
+top_level_decl  = state_decl | component_decl ;
+
+state_decl      = ( "@state" | "@computed" | "@persist" ) , identifier ,
+                  [ ":" , type_ref ] , "=" , expression ;
+
+component_decl  = "component" , identifier , "{" ,
+                  [ route_decl ] ,
+                  { state_decl } ,
+                  view_decl ,
+                  "}" ;
+
+route_decl      = "route" , ":" , string_literal ;
+
+view_decl       = "view" , "{" , { widget_node } , "}" ;
+
+widget_node     = for_each_node
+                | if_node
+                | element_node ;
+
+for_each_node   = "ForEach" , "(" , expression , ")" , "->" , identifier ,
+                  "{" , { widget_node } , "}" ;
+
+if_node         = "If" , "(" , expression , ")" ,
+                  "{" , { widget_node } , "}" ,
+                  [ "Else" , "{" , { widget_node } , "}" ] ;
+
+element_node    = identifier , [ "(" , [ arg_list ] , ")" ] ,
+                  [ "{" , { widget_node | statement } , "}" ] ,
+                  { modifier_chain } ;
+
+modifier_chain  = "." , identifier , "(" , [ arg_list ] , ")" ;
+
+arg_list        = argument , { "," , argument } ;
+argument        = [ identifier , ":" ] , expression ;
+
+type_ref        = identifier , [ "<" , type_ref , { "," , type_ref } , ">" ] ;
+
+expression      = literal
+                | hex_color
+                | unit_literal
+                | enum_shorthand
+                | list_literal
+                | identifier ;
+
+hex_color       = "#" , 6 * hex_digit | 8 * hex_digit ;
+unit_literal    = number , ( ".dp" | ".sp" | ".ms" | ".px" ) ;
+enum_shorthand  = "." , identifier ;
+

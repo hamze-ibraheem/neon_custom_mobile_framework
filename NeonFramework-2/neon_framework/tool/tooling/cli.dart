@@ -2,6 +2,8 @@ import 'package:args/command_runner.dart';
 import 'command_create.dart';
 import 'command_run.dart';
 import 'command_build.dart';
+import 'command_compile.dart';
+import 'command_studio.dart';
 import 'command_doctor.dart';
 import 'command_clean.dart';
 
@@ -13,12 +15,14 @@ class NeonCli {
   NeonCli() {
     _runner = CommandRunner<int>(
       'neon',
-      'Neon Framework CLI — Build mobile apps with Dart.',
+      'Neon Framework CLI — Build mobile apps with NeonLang (.neon) & Dart (.dart).',
     );
 
     _runner.addCommand(CreateCommand());
     _runner.addCommand(RunCommand());
     _runner.addCommand(BuildCommand());
+    _runner.addCommand(CompileCommand());
+    _runner.addCommand(StudioCommand());
     _runner.addCommand(DoctorCommand());
     _runner.addCommand(CleanCommand());
 

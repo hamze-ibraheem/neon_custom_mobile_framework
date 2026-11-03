@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:args/command_runner.dart';
+import 'package:neon_framework/neon.dart';
 import 'package:path/path.dart' as p;
 import 'cli.dart';
 import 'neon_project.dart';
@@ -7,19 +8,18 @@ import 'ios/ios_generator.dart';
 import 'ios/xcode_cloud_setup.dart';
 
 class BuildCommand extends Command<int> {
-  @override
-  final String name = 'build';
-
-  @override
-  final String description = 'Build the Neon app for release.';
-
   BuildCommand() {
     argParser.addOption(
       'target',
       abbr: 't',
-      help: 'Target platform.',
-      allowed: ['android', 'ios'],
+      help: 'Target platform or package format (android, ios, apk, bundle, aab, app, ipa).',
+      allowed: ['android', 'ios', 'apk', 'bundle', 'aab', 'app', 'ipa'],
       defaultsTo: 'android',
+    );
+    argParser.addOption(
+      'host-os',
+      help: 'Host OS executing the build (windows, macos, linux).',
+      allowed: ['windows', 'macos', 'linux'],
     );
     argParser.addOption(
       'flavor',
@@ -54,6 +54,12 @@ class BuildCommand extends Command<int> {
       negatable: false,
     );
   }
+
+  @override
+  final String name = 'build';
+
+  @override
+  final String description = 'Build the Neon app for release (.apk, .bundle/.aab, .app, .ipa).';
 
   @override
   Future<int> run() async {
@@ -155,6 +161,28 @@ class BuildCommand extends Command<int> {
           obfuscate: obfuscate,
           isXcodeCloud: isXcodeCloud,
           isArchive: isArchive,
+        );
+      case 'apk':
+      case 'bundle':
+      case 'aab':
+      case 'app':
+      case 'ipa':
+        final pkgFormat = (target == 'aab' || target == 'bundle')
+            ? NeonPackageFormat.bundle
+            : NeonPackageFormat.values.firstWhere((f) => f.name == target);
+        const crossBuilder = NeonCrossOsBuilder();
+        final pkgRes = crossBuilder.build(NeonPackageBuildRequest(
+          appName: project.name,
+          bundleId: project.config['bundle_id'] as String? ?? 'dev.neonframework.app',
+          version: project.config['version'] as String? ?? '1.0.0',
+          buildNumber: 1,
+          format: pkgFormat,
+          outputDirectory: outputDir.path,
+        ));
+        return BuildResult(
+          success: pkgRes.success,
+          message: 'Built ${pkgFormat.name} on ${pkgRes.hostOs.name}',
+          outputPath: pkgRes.artifactPath,
         );
       default:
         return BuildResult(

@@ -68,3 +68,11 @@ export 'src/data/cache_policy.dart';
 export 'src/plugins/plugin.dart';
 export 'src/plugins/plugin_registry.dart';
 export 'src/plugins/example_plugins.dart';
+
+export 'src/language/neon_compiler.dart';
+export 'src/packaging/cross_os_builder.dart';
+export 'src/lsp/neon_lsp_server.dart';
+export 'src/mcp/neon_mcp_server.dart';
+export 'src/agents/antigravity_agent_hub.dart';
+export 'src/ide/neon_studio_ide.dart';
+
