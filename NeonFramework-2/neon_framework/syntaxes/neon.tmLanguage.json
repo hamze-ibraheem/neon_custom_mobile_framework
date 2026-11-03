@@ -1,0 +1,86 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "NeonLang",
+  "scopeName": "source.neon",
+  "fileTypes": ["neon"],
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#annotations" },
+    { "include": "#keywords" },
+    { "include": "#widgets" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#colors" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.neon",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.neon",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "annotations": {
+      "patterns": [
+        {
+          "name": "storage.modifier.annotation.neon",
+          "match": "@(state|computed|persist)\\b"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.neon",
+          "match": "\\b(module|import|component|route|view|ForEach|If|Else|true|false)\\b"
+        }
+      ]
+    },
+    "widgets": {
+      "patterns": [
+        {
+          "name": "support.class.widget.neon",
+          "match": "\\b(Scaffold|AppBar|Column|Row|Container|Card|Text|Button|FilledButton|OutlinedButton|IconButton|FloatingActionButton|Badge|Chip|TextField|SearchBar|Switch|Checkbox|Slider|ListTile|ProgressIndicator|ScrollView|ListView|Stack|Padding|Center)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.neon",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.neon",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.unit.neon",
+          "match": "\\b\\d+(\\.\\d+)?\\.(dp|sp|ms|px)\\b"
+        },
+        {
+          "name": "constant.numeric.neon",
+          "match": "\\b\\d+(\\.\\d+)?\\b"
+        }
+      ]
+    },
+    "colors": {
+      "patterns": [
+        {
+          "name": "constant.other.color.hex.neon",
+          "match": "#[0-9a-fA-F]{6,8}\\b"
+        }
+      ]
+    }
+  }
+}
+
