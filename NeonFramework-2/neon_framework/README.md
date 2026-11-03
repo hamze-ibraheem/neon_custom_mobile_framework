@@ -168,8 +168,16 @@ neon_framework/
 │       ├── state/                 # Reactive signals, computed, effects, async values
 │       ├── platform/              # Platform channels, bridge, filesystem
 │       ├── data/                  # Key-value store, SQLite, HTTP, WebSocket, cache
-│       └── plugins/               # Plugin model, registry, semver, hooks
-└── test/                          # 403 automated unit and integration tests
+│       ├── plugins/               # Plugin model, registry, semver, hooks
+│       ├── language/              # NeonLang (.neon) Lexer, Parser, AST, Analyzer & Codegen
+│       ├── packaging/             # Universal Cross-OS Builder (.apk, .bundle, .app, .ipa)
+│       ├── lsp/                   # Language Server Protocol (neon-lsp)
+│       ├── mcp/                   # Model Context Protocol Server (neon-mcp-server)
+│       ├── agents/                # Google Antigravity SDK Multi-Agent Hub
+│       └── ide/                   # Neon Studio IDE Workbench Engine
+├── neon_studio/                   # Neon Studio IDE Server (:9090), Web UI, & Desktop Packager
+├── examples/                      # Declarative .neon reference showcase screens
+└── test/                          # 431 automated unit and integration tests
 ```
 
 ---
@@ -249,6 +257,26 @@ Pull requests introducing new **features** or **enhancements** on `dev-beta-vers
 
 ---
 
+## NeonLang (`.neon`), Neon Studio IDE & Cross-OS Packaging
+
+- **Compile `.neon` to `.dart` (100% Two-Way Dart Interop):**
+  ```bash
+  dart run bin/neon.dart compile examples/task_studio.neon --watch
+  ```
+- **Launch Neon Studio IDE Workbench (`http://localhost:9090`):**
+  ```bash
+  dart run bin/neon.dart studio
+  ```
+- **Build Android (`.apk`, `.bundle`/`.aab`) & iOS (`.app`, `.ipa`) on Windows, macOS, or Linux Ubuntu:**
+  ```bash
+  dart run bin/neon.dart build -t apk
+  dart run bin/neon.dart build -t bundle
+  dart run bin/neon.dart build -t app
+  dart run bin/neon.dart build -t ipa
+  ```
+
+---
+
 ## Testing
 
 Run the full automated test suite:
@@ -257,7 +285,7 @@ Run the full automated test suite:
 dart test
 ```
 
-All 403 tests pass cleanly.
+All 431 tests pass cleanly with 0 analyzer warnings (`dart analyze --fatal-warnings`).
 
 ---
 

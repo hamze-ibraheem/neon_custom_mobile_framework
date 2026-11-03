@@ -1,0 +1,30 @@
+// Productivity Analytics Screen — Declarative NeonLang (.neon)
+module app.screens.analytics
+
+import "package:neon_framework/neon.dart"
+
+@state completionRate: Int = 40
+@state completedCount: Int = 2
+
+component ProductivityAnalyticsScreen {
+    route: "/analytics"
+
+    view {
+        Scaffold(title: "Productivity Analytics") {
+            Column(padding: 16.dp, gap: 12.dp) {
+                Card(elevation: 2) {
+                    Row(align: .spaceBetween) {
+                        Text("Overall Completion Rate")
+                            .font(size: 18, weight: .bold)
+                            .color(#4F46E5)
+                        Badge("40% Done")
+                    }
+                }
+                Button("+ Add New Task") {
+                    completedCount += 1
+                }
+            }
+        }
+    }
+}
+

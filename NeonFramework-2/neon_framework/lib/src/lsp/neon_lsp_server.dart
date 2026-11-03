@@ -111,6 +111,16 @@ class NeonLspServer {
           },
         };
 
+      case 'textDocument/definition':
+        final uri = params['uri'] as String? ?? '';
+        final symbol = params['symbol'] as String? ?? '';
+        final defLoc = provideDefinition(uri, symbol);
+        return <String, dynamic>{
+          'jsonrpc': '2.0',
+          'id': id,
+          'result': defLoc,
+        };
+
       default:
         return <String, dynamic>{
           'jsonrpc': '2.0',
@@ -188,6 +198,45 @@ class NeonLspServer {
       return '### `.$clean(...)` (NeonLang Modifier)\nChains styling or layout configuration onto the target widget.';
     }
     return '### `$symbol`\nNeonLang symbol in active workspace.';
+  }
+
+  /// Resolves go-to-definition coordinates for a component or `@state` variable in [uri].
+  Map<String, dynamic> provideDefinition(String uri, String symbol) {
+    final compiled = _cachedCompilations[uri];
+    if (compiled != null) {
+      for (final comp in compiled.program.components) {
+        if (comp.name == symbol) {
+          return <String, dynamic>{
+            'uri': uri,
+            'line': comp.line,
+            'column': comp.column,
+          };
+        }
+        for (final st in comp.states) {
+          if (st.name == symbol) {
+            return <String, dynamic>{
+              'uri': uri,
+              'line': st.line,
+              'column': st.column,
+            };
+          }
+        }
+      }
+      for (final st in compiled.program.topLevelStates) {
+        if (st.name == symbol) {
+          return <String, dynamic>{
+            'uri': uri,
+            'line': st.line,
+            'column': st.column,
+          };
+        }
+      }
+    }
+    return <String, dynamic>{
+      'uri': uri,
+      'line': 1,
+      'column': 1,
+    };
   }
 }
 
