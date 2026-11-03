@@ -1,0 +1,13 @@
+# Easypanel / Hostinger Dockerfile for Neon Studio IDE
+FROM dart:stable
+
+WORKDIR /app
+COPY . .
+
+WORKDIR /app/NeonFramework-2/neon_framework
+RUN dart pub get
+
+EXPOSE 9090
+ENV PORT=9090
+
+CMD ["dart", "run", "neon_studio/neon_studio_server.dart"]
