@@ -12,7 +12,8 @@ class BuildCommand extends Command<int> {
     argParser.addOption(
       'target',
       abbr: 't',
-      help: 'Target platform or package format (android, ios, apk, bundle, aab, app, ipa).',
+      help:
+          'Target platform or package format (android, ios, apk, bundle, aab, app, ipa).',
       allowed: ['android', 'ios', 'apk', 'bundle', 'aab', 'app', 'ipa'],
       defaultsTo: 'android',
     );
@@ -45,12 +46,14 @@ class BuildCommand extends Command<int> {
     );
     argParser.addFlag(
       'xcode-cloud',
-      help: 'Configure and validate project for Apple Developer Xcode Cloud & TestFlight automated builds.',
+      help:
+          'Configure and validate project for Apple Developer Xcode Cloud & TestFlight automated builds.',
       negatable: false,
     );
     argParser.addFlag(
       'archive',
-      help: 'Create a local Xcode archive (.xcarchive) using xcodebuild on macOS.',
+      help:
+          'Create a local Xcode archive (.xcarchive) using xcodebuild on macOS.',
       negatable: false,
     );
   }
@@ -59,15 +62,24 @@ class BuildCommand extends Command<int> {
   final String name = 'build';
 
   @override
-  final String description = 'Build the Neon app for release (.apk, .bundle/.aab, .app, .ipa).';
+  final String description =
+      'Build the Neon app for release (.apk, .bundle/.aab, .app, .ipa).';
 
   @override
   Future<int> run() async {
     final args = argResults!;
     var target = args['target'] as String;
-    if (args.rest.contains('apk') || args.rest.contains('android')) {
+    if (args.rest.contains('apk')) {
+      target = 'apk';
+    } else if (args.rest.contains('bundle') || args.rest.contains('aab')) {
+      target = 'bundle';
+    } else if (args.rest.contains('app')) {
+      target = 'app';
+    } else if (args.rest.contains('ipa')) {
+      target = 'ipa';
+    } else if (args.rest.contains('android')) {
       target = 'android';
-    } else if (args.rest.contains('ios') || args.rest.contains('ipa')) {
+    } else if (args.rest.contains('ios')) {
       target = 'ios';
     }
     final flavor = args['flavor'] as String?;
@@ -173,7 +185,8 @@ class BuildCommand extends Command<int> {
         const crossBuilder = NeonCrossOsBuilder();
         final pkgRes = crossBuilder.build(NeonPackageBuildRequest(
           appName: project.name,
-          bundleId: project.config['bundle_id'] as String? ?? 'dev.neonframework.app',
+          bundleId:
+              project.config['bundle_id'] as String? ?? 'dev.neonframework.app',
           version: project.config['version'] as String? ?? '1.0.0',
           buildNumber: 1,
           format: pkgFormat,
@@ -236,27 +249,32 @@ class BuildCommand extends Command<int> {
     required bool isArchive,
   }) {
     try {
-      final bundleId = project.config['bundle_id'] as String? ?? 'com.neon.myapp';
+      final bundleId =
+          project.config['bundle_id'] as String? ?? 'com.neon.myapp';
       final schemeName = project.config['scheme'] as String? ?? 'NeonApp';
 
       // 1. If Xcode Cloud flag requested, setup and validate CI environment
       if (isXcodeCloud) {
-        NeonLogger.info('Configuring Xcode Cloud automated CI for TestFlight...');
+        NeonLogger.info(
+            'Configuring Xcode Cloud automated CI for TestFlight...');
         final xcodeCloud = XcodeCloudSetup(projectRoot: project.rootPath);
         xcodeCloud.setupCiScripts(bundleId: bundleId, schemeName: schemeName);
 
         final iosGen = IosGenerator(projectRoot: project.rootPath);
-        final isReady = iosGen.verifyXcodeCloudReadiness(schemeName: schemeName);
+        final isReady =
+            iosGen.verifyXcodeCloudReadiness(schemeName: schemeName);
 
         NeonLogger.info('Xcode Cloud Checklist:');
         NeonLogger.info(' • App ID registered in Apple Developer: $bundleId');
         NeonLogger.info(' • App Record created in App Store Connect');
         NeonLogger.info(' • Shared Scheme active: $schemeName.xcscheme');
         NeonLogger.info(' • CI scripts generated in ci_scripts/');
-        NeonLogger.info(' • TestFlight auto-distribution enabled in Xcode Cloud workflow');
+        NeonLogger.info(
+            ' • TestFlight auto-distribution enabled in Xcode Cloud workflow');
 
         if (!isReady) {
-          NeonLogger.warning('Project needs shared scheme verification before pushing to Git.');
+          NeonLogger.warning(
+              'Project needs shared scheme verification before pushing to Git.');
         }
       }
 
@@ -292,16 +310,21 @@ class BuildCommand extends Command<int> {
 
           if (xcodeProjects.isNotEmpty) {
             final projPath = xcodeProjects.first.path;
-            final archivePath = p.join(outputDir.path, '${project.name}.xcarchive');
+            final archivePath =
+                p.join(outputDir.path, '${project.name}.xcarchive');
             NeonLogger.step('Creating Xcode archive at $archivePath...');
 
             final archiveResult = Process.runSync(
               'xcodebuild',
               [
-                '-project', projPath,
-                '-scheme', schemeName,
-                '-configuration', 'Release',
-                '-archivePath', archivePath,
+                '-project',
+                projPath,
+                '-scheme',
+                schemeName,
+                '-configuration',
+                'Release',
+                '-archivePath',
+                archivePath,
                 'archive',
                 'CODE_SIGNING_ALLOWED=NO',
               ],
@@ -315,7 +338,8 @@ class BuildCommand extends Command<int> {
                 outputPath: archivePath,
               );
             } else {
-              NeonLogger.warning('Local archive skipped or requires signing: ${archiveResult.stderr}');
+              NeonLogger.warning(
+                  'Local archive skipped or requires signing: ${archiveResult.stderr}');
             }
           }
         }
@@ -323,7 +347,7 @@ class BuildCommand extends Command<int> {
 
       return BuildResult(
         success: true,
-        message: isXcodeCloud 
+        message: isXcodeCloud
             ? 'iOS Xcode Cloud readiness verified & configured.'
             : 'iOS build complete.',
         outputPath: outputDir.path,
